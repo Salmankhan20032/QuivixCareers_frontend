@@ -1,0 +1,133 @@
+/* src/pages/AboutPage.css */
+
+/*
+  ============================================
+  About Page - White & Blue Redesign
+  ============================================
+*/
+
+/* Re-using color palette for consistency */
+:root {
+  --primary-blue: #007bff;
+  --primary-blue-dark: #0056b3;
+  --light-blue-bg: #e9f2ff;
+  --pale-blue-bg: #f8faff;
+  --white: #ffffff;
+  --border-color: #dee2e6;
+  --shadow-color-light: rgba(0, 123, 255, 0.1);
+  --text-dark: #212529;
+  --text-light: #495057;
+}
+
+.about-page {
+  background-color: var(--pale-blue-bg);
+  padding: 3rem 0; /* Add vertical spacing for the page */
+}
+
+/* Page Header Section */
+.about-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.about-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary-blue-dark);
+  margin-bottom: 0.75rem;
+}
+
+.about-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-light);
+  max-width: 700px;
+  margin: 0 auto; /* Center the subtitle */
+}
+
+/* Main Content Card */
+.about-content-card {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 20px var(--shadow-color-light);
+  margin-bottom: 4rem;
+}
+
+.about-content-card p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-dark);
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Features Section */
+.features-section .row {
+  justify-content: center;
+}
+
+.feature-card {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 30px rgba(0, 123, 255, 0.15);
+  border-color: var(--primary-blue);
+}
+
+.feature-icon-wrapper {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1.5rem auto;
+  border-radius: 50%;
+  background: var(--light-blue-bg);
+  color: var(--primary-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon-wrapper {
+  background: var(--primary-blue);
+  color: var(--white);
+  transform: scale(1.1) rotate(-10deg);
+}
+
+.feature-card h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.75rem;
+}
+
+.feature-card p {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Responsive styles */
+@media (max-width: 767px) {
+  .about-title {
+    font-size: 2.25rem;
+  }
+  .about-subtitle {
+    font-size: 1.1rem;
+  }
+  .about-content-card {
+    padding: 1.5rem;
+  }
+  .feature-card {
+    margin-bottom: 1.5rem;
+  }
+}

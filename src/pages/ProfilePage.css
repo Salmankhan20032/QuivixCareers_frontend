@@ -1,0 +1,215 @@
+/* src/pages/ProfilePage.css */
+
+/*
+  ============================================
+  Profile Page - White & Blue Redesign
+  ============================================
+*/
+
+/* Color Palette */
+:root {
+  --primary-blue: #007bff;
+  --primary-blue-dark: #0056b3;
+  --success-green: #198754;
+  --warning-orange: #ffc107;
+  --pale-blue-bg: #f8faff;
+  --white: #ffffff;
+  --border-color: #dee2e6;
+  --shadow-color-light: rgba(0, 123, 255, 0.1);
+  --shadow-color-dark: rgba(0, 123, 255, 0.15);
+  --text-dark: #212529;
+  --text-light: #495057;
+  --text-muted: #6c757d;
+}
+
+.profile-page {
+  background-color: var(--pale-blue-bg);
+  min-height: 100vh;
+  padding: 3rem 0;
+}
+
+/* Profile Header Card */
+.profile-header-card {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px var(--shadow-color-light);
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 4px solid var(--border-color);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+.edit-avatar-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  border: 3px solid var(--white);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-avatar-btn:hover {
+  transform: scale(1.1);
+  background: var(--primary-blue-dark);
+}
+
+.profile-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.25rem;
+}
+
+.profile-email {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+/* Info Cards */
+.info-card {
+  background: var(--white);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  padding: 1.25rem;
+  height: 100%;
+}
+
+.info-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+/* Forms in Edit Mode */
+.info-card .form-control,
+.info-card .form-select {
+  border-radius: 8px;
+}
+.info-card .form-control:focus,
+.info-card .form-select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px var(--shadow-color-light);
+}
+
+/* Internships Section Header */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-left: 0.5rem; /* Align with cards */
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+/* Custom Internship Card for Profile */
+.profile-internship-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow: 0 4px 15px var(--shadow-color-light);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.profile-internship-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px var(--shadow-color-dark);
+}
+
+.internship-thumbnail {
+  height: 180px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.internship-body {
+  padding: 1.5rem;
+}
+
+.internship-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* Empty State Styling */
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px var(--shadow-color-light);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  color: var(--primary-blue);
+  opacity: 0.5;
+}
+
+/* General Action Buttons */
+.action-btn {
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .profile-header-card {
+    text-align: center;
+    padding: 1.5rem;
+  }
+  .profile-name {
+    font-size: 2rem;
+  }
+  .profile-page {
+    padding: 1.5rem 0;
+  }
+}

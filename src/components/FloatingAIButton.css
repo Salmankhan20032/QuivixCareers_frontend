@@ -1,0 +1,29 @@
+.floating-ai-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden; /* Ensures image stays inside circle */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  background: transparent; /* no background, only image */
+  padding: 0;
+  border: none;
+}
+
+.floating-ai-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.floating-ai-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Makes image fill circle */
+}

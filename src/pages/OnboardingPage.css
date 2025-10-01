@@ -1,0 +1,237 @@
+/* src/pages/OnboardingPage.css */
+
+/*
+  ============================================
+  Onboarding Page - White & Blue Redesign
+  ============================================
+*/
+
+:root {
+  --primary-blue: #007bff;
+  --primary-blue-dark: #0056b3;
+  --pale-blue-bg: #f8faff;
+  --white: #ffffff;
+  --border-color: #dee2e6;
+  --shadow-color-light: rgba(0, 123, 255, 0.1);
+  --text-dark: #212529;
+  --text-muted: #6c757d;
+}
+
+.onboarding-page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--pale-blue-bg);
+  padding: 1.5rem;
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 650px;
+  background: var(--white);
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Stepper */
+.stepper-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 3rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--pale-blue-bg);
+}
+.step-item {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  width: 33.33%;
+}
+.step-connector {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  right: -50%;
+  height: 4px;
+  background-color: var(--border-color);
+  z-index: 1;
+}
+.step-item:last-child .step-connector {
+  display: none;
+}
+
+.step-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--white);
+  border: 2px solid var(--border-color);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+.step-label {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+}
+.step-item.active .step-circle {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: var(--white);
+}
+.step-item.active .step-label {
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+.step-item.completed .step-circle {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: var(--white);
+}
+
+.onboarding-body {
+  padding: 2.5rem 3rem;
+}
+.step-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.step-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.step-subtitle {
+  color: var(--text-muted);
+}
+
+/* Avatar Upload */
+.avatar-upload-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+.avatar-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 4px dashed var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: var(--text-muted);
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.avatar-preview:hover {
+  border-color: var(--primary-blue);
+  background-color: var(--pale-blue-bg);
+}
+.avatar-preview .upload-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.avatar-preview .upload-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.avatar-preview input[type="file"] {
+  display: none;
+}
+
+/* Interest Cards */
+.interests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.interest-card-label {
+  cursor: pointer;
+}
+.interest-card {
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.interest-card:hover {
+  border-color: var(--primary-blue);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 15px var(--shadow-color-light);
+}
+.interest-card-radio {
+  display: none;
+}
+.interest-card-radio:checked + .interest-card {
+  border-color: var(--primary-blue);
+  background-color: var(--light-blue-bg);
+  box-shadow: 0 4px 15px var(--shadow-color-light);
+}
+.interest-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-blue);
+}
+.interest-name {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* Form Styles */
+.form-input {
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+}
+.form-input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px var(--shadow-color-light);
+}
+
+.onboarding-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+.onboarding-btn {
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+@media (max-width: 576px) {
+  .onboarding-body {
+    padding: 2rem 1.5rem;
+  }
+  .stepper-container {
+    padding: 1.5rem;
+  }
+}

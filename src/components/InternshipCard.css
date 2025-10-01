@@ -1,0 +1,126 @@
+/* src/components/InternshipCard.css */
+
+/*
+  ============================================
+  Internship Card - White & Blue Redesign
+  ============================================
+*/
+
+/* Color Palette */
+:root {
+  --primary-blue: #007bff;
+  --primary-blue-dark: #0056b3;
+  --success-green: #198754;
+  --success-green-dark: #146c43;
+  --white: #ffffff;
+  --pale-blue-bg: #f8faff;
+  --border-color: #dee2e6;
+  --shadow-color-light: rgba(0, 123, 255, 0.1);
+  --text-dark: #212529;
+  --text-light: #495057;
+}
+
+.internship-card {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px var(--shadow-color-light);
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.internship-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 30px rgba(0, 123, 255, 0.15);
+  border-color: var(--primary-blue);
+}
+
+.thumbnail-img {
+  height: 180px;
+  object-fit: cover;
+  border-top-left-radius: 15px; /* Match parent */
+  border-top-right-radius: 15px; /* Match parent */
+  transition: transform 0.3s ease;
+}
+
+.internship-card:hover .thumbnail-img {
+  transform: scale(1.03);
+}
+
+.card-body-custom {
+  padding: 1.25rem;
+  flex-grow: 1; /* Allow body to grow */
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title-custom {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+  /* Ensure consistent height and prevent layout shift */
+  min-height: 58px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.internship-meta {
+  margin-top: auto; /* Push meta info to the bottom of the card body */
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.meta-item .icon {
+  color: var(--primary-blue);
+}
+
+.card-footer-custom {
+  background: var(--pale-blue-bg);
+  border-top: 1px solid var(--border-color);
+  padding: 1rem;
+}
+
+.btn-custom {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-apply {
+  background-color: var(--primary-blue);
+  color: var(--white);
+}
+.btn-apply:hover {
+  background-color: var(--primary-blue-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.btn-continue {
+  background-color: var(--success-green);
+  color: var(--white);
+}
+.btn-continue:hover {
+  background-color: var(--success-green-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(25, 135, 84, 0.3);
+}

@@ -1,0 +1,125 @@
+/* src/pages/OTPVerificationPage.css */
+
+/*
+  ============================================
+  OTP Page - White & Blue Redesign
+  ============================================
+*/
+
+:root {
+  --primary-blue: #007bff;
+  --pale-blue-bg: #f8faff;
+  --light-blue-bg: #e9f2ff;
+  --white: #ffffff;
+  --border-color: #dee2e6;
+  --shadow-color-light: rgba(0, 123, 255, 0.1);
+  --text-dark: #212529;
+  --text-muted: #6c757d;
+}
+
+.otp-page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--pale-blue-bg);
+  padding: 1.5rem;
+}
+
+.otp-card {
+  width: 100%;
+  max-width: 450px;
+  background: var(--white);
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem 3rem;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.otp-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.otp-icon-wrapper {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1.5rem auto;
+  border-radius: 50%;
+  background-color: var(--light-blue-bg);
+  color: var(--primary-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.otp-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+}
+
+.otp-subtitle {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.otp-subtitle strong {
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+/* Styled OTP Input */
+.otp-input {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 0.75rem; /* Creates space between numbers */
+  padding-left: 1.5rem; /* Adjust padding to recenter text with letter-spacing */
+  border-radius: 12px;
+}
+
+.otp-input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px var(--shadow-color-light);
+}
+
+.otp-verify-btn {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+.resend-link {
+  color: var(--primary-blue);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.resend-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+  .otp-card {
+    padding: 2rem 1.5rem;
+  }
+  .otp-title {
+    font-size: 1.75rem;
+  }
+}

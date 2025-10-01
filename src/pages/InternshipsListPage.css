@@ -1,0 +1,177 @@
+/* src/pages/InternshipsListPage.css */
+
+/*
+  ============================================
+  Internships List Page - White & Blue Redesign
+  ============================================
+*/
+
+/* Color Palette */
+:root {
+  --primary-blue: #007bff;
+  --pale-blue-bg: #f8faff;
+  --light-blue-bg: #e9f2ff;
+  --white: #ffffff;
+  --border-color: #dee2e6;
+  --shadow-color-light: rgba(0, 123, 255, 0.1);
+  --shadow-color-dark: rgba(0, 123, 255, 0.15);
+  --text-dark: #212529;
+  --text-light: #495057;
+  --text-muted: #6c757d;
+}
+
+.internships-page {
+  background-color: var(--pale-blue-bg);
+  min-height: 100vh;
+  padding: 3rem 0;
+}
+
+/* Page Header */
+.page-header {
+  background-color: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  padding: 2.5rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 20px var(--shadow-color-light);
+}
+
+.page-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.page-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-light);
+  max-width: 600px;
+}
+
+/* Stat Cards */
+.stat-card {
+  background-color: var(--light-blue-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  height: 100%;
+}
+
+.stat-icon {
+  font-size: 2rem;
+  color: var(--primary-blue);
+  margin-bottom: 0.75rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.stat-label {
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+/* Field Group Section */
+.field-header {
+  background-color: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  border-left-width: 5px;
+  transition: all 0.3s ease;
+}
+
+.field-header:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px var(--shadow-color-dark);
+}
+
+.field-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  transition: transform 0.3s ease;
+}
+.field-header:hover .field-icon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.field-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* Theme Colors for Fields */
+.theme-web .field-header {
+  border-left-color: #0d6efd;
+}
+.theme-web .field-icon {
+  background-color: #e7f0ff;
+  color: #0d6efd;
+}
+.theme-mobile .field-header {
+  border-left-color: #d63384;
+}
+.theme-mobile .field-icon {
+  background-color: #fce8f3;
+  color: #d63384;
+}
+.theme-data .field-header {
+  border-left-color: #0dcaf0;
+}
+.theme-data .field-icon {
+  background-color: #e7fafc;
+  color: #0dcaf0;
+}
+.theme-default .field-header {
+  border-left-color: #198754;
+}
+.theme-default .field-icon {
+  background-color: #e8f3ee;
+  color: #198754;
+}
+
+/* Final CTA Card */
+.cta-card {
+  background: var(--light-blue-bg);
+  border: 2px dashed var(--primary-blue);
+  border-radius: 16px;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.cta-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Loading and Error States */
+.loading-container {
+  min-height: 70vh;
+}
+.loading-container .spinner-border {
+  width: 4rem;
+  height: 4rem;
+}

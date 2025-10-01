@@ -1,0 +1,125 @@
+/* src/components/Footer.css */
+
+/*
+  ============================================
+  App Footer - White & Blue Redesign
+  ============================================
+*/
+
+/* Color Palette */
+:root {
+  --primary-blue: #007bff;
+  --white: #ffffff;
+  --border-color: #dee2e6;
+  --text-dark: #212529;
+  --text-light: #495057;
+  --text-muted: #6c757d;
+}
+
+.app-footer {
+  background-color: var(--white);
+  color: var(--text-light);
+  padding: 4rem 0 2rem 0;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.95rem;
+}
+
+/* Brand Section */
+.footer-brand .footer-logo {
+  max-height: 45px;
+  margin-bottom: 1rem;
+}
+
+.footer-brand .footer-tagline {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* Headings and Links */
+.footer-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 1.25rem;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+  color: var(--text-light);
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+}
+
+.footer-links a:hover {
+  color: var(--primary-blue);
+  transform: translateX(4px);
+}
+
+/* Social Media Icons */
+.social-icons {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.social-icons a {
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.social-icons a:hover {
+  color: var(--primary-blue);
+  transform: translateY(-3px);
+}
+
+/* Bottom Bar */
+.footer-divider {
+  margin: 2.5rem 0;
+  border-color: var(--border-color);
+  opacity: 0.5;
+}
+
+.footer-bottom {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.footer-bottom .bottom-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-left: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+.footer-bottom .bottom-link:hover {
+  color: var(--primary-blue);
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .app-footer {
+    text-align: center;
+  }
+  .social-icons {
+    justify-content: center;
+  }
+  .footer-bottom {
+    text-align: center;
+  }
+  .footer-bottom .text-md-end {
+    margin-top: 0.5rem;
+    text-align: center !important;
+  }
+}
