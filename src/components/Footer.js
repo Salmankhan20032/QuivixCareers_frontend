@@ -4,7 +4,7 @@ import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { Twitter, Linkedin, Github, Facebook } from "react-bootstrap-icons";
-import "./Footer.css"; // We will create this stylesheet next
+import "./Footer.css"; // Ensure you create this stylesheet
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -63,8 +63,10 @@ const Footer = () => {
               Stay up to date with the latest news and opportunities.
             </p>
             <div className="social-icons">
+              {/* --- THE FIX IS HERE --- */}
+              {/* Providing full, valid placeholder URLs for external links. */}
               <a
-                href="#"
+                href="https://twitter.com/quivix"
                 aria-label="Twitter"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -72,7 +74,7 @@ const Footer = () => {
                 <Twitter />
               </a>
               <a
-                href="#"
+                href="https://linkedin.com/company/quivix"
                 aria-label="LinkedIn"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -80,7 +82,7 @@ const Footer = () => {
                 <Linkedin />
               </a>
               <a
-                href="#"
+                href="https://github.com/quivix"
                 aria-label="GitHub"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -88,7 +90,7 @@ const Footer = () => {
                 <Github />
               </a>
               <a
-                href="#"
+                href="https://facebook.com/quivix"
                 aria-label="Facebook"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -109,6 +111,7 @@ const Footer = () => {
             </p>
           </Col>
           <Col md={6} className="text-md-end">
+            {/* These are internal links, so they are perfectly fine with <Link> */}
             <Link to="/privacy-policy" className="bottom-link">
               Privacy Policy
             </Link>

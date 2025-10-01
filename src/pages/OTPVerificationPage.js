@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../hooks/useAuth";
-import { Container, Form, Button, Alert, Spinner } from "react-bootstrap";
+import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import { EnvelopeCheckFill } from "react-bootstrap-icons";
 import "./OTPVerificationPage.css"; // Import our beautiful new styles
 

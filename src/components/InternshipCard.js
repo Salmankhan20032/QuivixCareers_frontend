@@ -5,7 +5,7 @@ import { Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import Loader from "./Loader";
-import { PeopleFill, CalendarEvent, ClockHistory } from "react-bootstrap-icons";
+import { PeopleFill, ClockHistory } from "react-bootstrap-icons";
 import "./InternshipCard.css"; // Import the new stylesheet
 
 const InternshipCard = ({ internship, isApplied, onApplySuccess }) => {
