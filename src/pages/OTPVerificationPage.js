@@ -6,7 +6,7 @@ import axios from "axios";
 import useAuth from "../hooks/useAuth";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import { EnvelopeCheckFill } from "react-bootstrap-icons";
-import "./OTPVerificationPage.css"; // Import our beautiful new styles
+import "./OTPVerificationPage.css";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000";
 
@@ -43,8 +43,13 @@ const OTPVerificationPage = () => {
         email,
         otp,
       });
+      // This function handles everything: setting state, local storage, AND navigating
+      // to the correct next page (onboarding or home).
       loginAfterVerification(response.data);
-      navigate("/onboarding");
+
+      // --- THE FIX ---
+      // We REMOVE the line below. The AuthContext now handles all navigation.
+      // navigate("/onboarding");
     } catch (err) {
       setError(
         err.response?.data?.error || "Verification failed. Please try again."
