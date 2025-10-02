@@ -81,12 +81,10 @@ const OnboardingPage = () => {
     setError("");
     const formData = new FormData();
 
-    // Use dot notation for nested profile fields
-    if (profilePic) formData.append("profile.profile_picture", profilePic);
-    if (university.trim())
-      formData.append("profile.university", university.trim());
-    if (major.trim()) formData.append("profile.major", major.trim());
-    if (interest) formData.append("profile.interest", interest);
+    if (profilePic) formData.append("profile_picture", profilePic);
+    if (university.trim()) formData.append("university", university.trim());
+    if (major.trim()) formData.append("major", major.trim());
+    if (interest) formData.append("interest", interest);
 
     try {
       const response = await axiosInstance.put("/api/auth/profile/", formData);
