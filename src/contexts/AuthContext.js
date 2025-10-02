@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import axiosInstance from "../api/axiosInstance"; // <-- IMPORT our configured axios instance
+import axiosInstance from "../api/axiosInstance";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
 const AuthContext = createContext();
@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }) => {
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
 
-        // Check if the user needs onboarding
         if (!userData.profile.university || !userData.profile.interest) {
           navigate("/onboarding");
         } else {
@@ -47,14 +46,13 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Login failed:", error);
       if (error.response && error.response.data.detail) {
-        alert(error.response.data.detail); // Show specific error from backend
+        alert(error.response.data.detail);
       } else {
         alert("Login failed! Please check your credentials.");
       }
     }
   };
 
-  // This function is for initial registration, which now leads to OTP verification
   const registerUser = async (
     email,
     fullName,
@@ -70,29 +68,44 @@ export const AuthProvider = ({ children }) => {
         password2,
         nationality,
       });
-      // --- NEW BEHAVIOR ---
-      // On successful registration, go to the OTP page
       navigate("/verify-otp", { state: { email } });
     } catch (error) {
       console.error(
         "Registration failed:",
         error.response?.data || error.message
       );
-      alert(
-        "Registration failed! " +
-          JSON.stringify(error.response?.data || "An error occurred.")
-      );
+
+      // --- THE FIX IS HERE ---
+      // This logic provides a much cleaner error message to the user.
+      let errorMessage = "Registration failed! An unexpected error occurred.";
+      if (error.response) {
+        // If the backend sent a structured JSON error
+        if (
+          typeof error.response.data === "object" &&
+          error.response.data !== null
+        ) {
+          // Join validation errors into a single string
+          errorMessage = Object.values(error.response.data).flat().join(" ");
+        }
+        // If the backend sent an HTML error page (like a 500 error)
+        else if (
+          typeof error.response.data === "string" &&
+          error.response.data.includes("</html>")
+        ) {
+          errorMessage =
+            "A server error occurred during registration. Please try again later.";
+        }
+      }
+      alert(errorMessage);
     }
   };
 
-  // --- NEW FUNCTION TO LOG IN AFTER SUCCESSFUL OTP VERIFICATION ---
   const loginAfterVerification = (data) => {
     setAuthTokens(data);
-    setUser(data.user); // The user object is now sent back from our verify view
+    setUser(data.user);
     localStorage.setItem("authTokens", JSON.stringify(data));
     localStorage.setItem("user", JSON.stringify(data.user));
 
-    // We also run the onboarding check here
     if (!data.user.profile.university || !data.user.profile.interest) {
       navigate("/onboarding");
     } else {
@@ -115,10 +128,9 @@ export const AuthProvider = ({ children }) => {
     loginUser,
     logoutUser,
     registerUser,
-    loginAfterVerification, // Expose the new function
+    loginAfterVerification,
   };
 
-  // This useEffect will run on app load to check if the user is already logged in
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (authTokens && storedUser) {
