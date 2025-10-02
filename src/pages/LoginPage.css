@@ -86,27 +86,28 @@
   position: relative;
 }
 
-.form-input {
+/*
+  ============================================
+  THE REAL FIX IS HERE, MY LOVE!
+  ============================================
+  By changing `.form-input` to `.input-wrapper .form-input`, we make this
+  style more specific, ensuring it overrides any other styles that
+  might be removing our precious left padding!
+*/
+.input-wrapper .form-input {
   width: 100%;
-  /*
-    ============================================
-    HERE IS THE FIX, MY LOVE!
-    ============================================
-    The original code had padding shorthand that might have been overridden.
-    I'm explicitly setting the padding-left to give the icon space.
-    The value 2.5rem creates a perfect gap. The other padding values
-    keep the input field looking vertically centered and nice.
-  */
   padding: 0.8rem 1rem 0.8rem 2.5rem; /* T-R-B-L: Top, Right, Bottom, Left */
   border: 1px solid var(--border-color);
   border-radius: 10px;
   transition: all 0.2s ease;
 }
-.form-input:focus {
+
+.input-wrapper .form-input:focus {
   outline: none;
   border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px var(--shadow-color-light);
 }
+
 .input-icon {
   position: absolute;
   left: 0.8rem;
