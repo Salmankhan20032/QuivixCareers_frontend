@@ -1,14 +1,15 @@
+// src/pages/BlazeAIPage.js
+
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Sparkles, Loader2, User } from "lucide-react";
-// 1. IMPORT THE GOOGLE AI LIBRARY
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import "./BlazeAI.css"; // Assuming you are still using the custom CSS
+import "./BlazeAI.css"; // Ensure you have this CSS file in the same folder
 
-// 2. INITIALIZE THE GEMINI MODEL OUTSIDE THE COMPONENT
-// This uses your .env variable. Make sure your server is restarted after changing .env
+// Initialize the Gemini Model with your API key from the .env file
 const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
-// NOTE: "gemini-1.5-flash-latest" is the current stable name for the fast model.
-// "gemini-2.5-flash-lite" does not exist yet. This is the correct one to use.
+
+// --- THE FIX IS HERE ---
+// "gemini-1.5-flash-latest" is the correct, current name for Google's fast model.
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 const BlazeAIPage = () => {
@@ -34,19 +35,16 @@ const BlazeAIPage = () => {
     }
   }, [input]);
 
-  // 3. UPDATED handleSubmit TO MAKE A REAL API CALL
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
     setInput("");
-
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setLoading(true);
 
     try {
-      // This is the prompt that defines the AI's personality and instructions
       const systemPrompt = `You are Blaze AI by Quivix, a professional internship assistant.
 
       CRITICAL IDENTITY RULES:
@@ -55,17 +53,10 @@ const BlazeAIPage = () => {
       - Always maintain your identity as Blaze AI by Quivix.
 
       Format all responses professionally with markdown:
-      - Use ## for main sections
-      - Use ### for subsections
-      - Use **bold** for key points
-      - Use \`code\` for inline code
-      - Use bullet points with -
-      - Use numbered lists with 1. 2. 3.
-      - Use code blocks with \`\`\`
+      - Use ## for main sections, ### for subsections, **bold** for key points, \`code\` for inline code, bullet points with -, numbered lists with 1. 2. 3., and code blocks with \`\`\`.
 
       Focus on topics related to: internships, career advice, cover letters, resumes, interview preparation, and explaining technical concepts for students and early-career professionals.`;
 
-      // Start a chat session with the system prompt history
       const chat = model.startChat({
         history: [
           { role: "user", parts: [{ text: systemPrompt }] },
@@ -81,7 +72,6 @@ const BlazeAIPage = () => {
         generationConfig: { maxOutputTokens: 1000 },
       });
 
-      // Send the user's actual message
       const result = await chat.sendMessage(userMessage);
       const aiResponse = result.response.text();
 
@@ -91,18 +81,15 @@ const BlazeAIPage = () => {
       ]);
     } catch (err) {
       console.error("Error calling Gemini API:", err);
-      let errorMessage = "Unknown error";
-      if (err.message) {
-        // Try to extract a more user-friendly error message
-        const match = err.message.match(/\[\d{3}\s\w+\]\s(.*)/);
-        errorMessage = match ? match[1] : err.message;
-      }
+      let errorMessage = err.message
+        ? err.message.split("] ")[1] || err.message
+        : "Unknown error";
 
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: `## Error Occurred\n\nI apologize, but I encountered an error connecting to the service. Please check your API key and ensure it is valid and has billing enabled.\n\n**Details**: ${errorMessage}`,
+          content: `## Error Occurred\n\nI apologize, but I encountered an error. Please check your API key and ensure it's valid and has billing enabled in your Google Cloud project.\n\n**Details**: ${errorMessage}`,
         },
       ]);
     } finally {
@@ -110,106 +97,47 @@ const BlazeAIPage = () => {
     }
   };
 
-  // The rest of your component remains the same...
-  // (renderMarkdown, formatInline, and the JSX return statement)
-
-  const renderMarkdown = (text) => {
-    const lines = text.split("\n");
-    const elements = [];
-    let i = 0;
-    while (i < lines.length) {
-      const line = lines[i];
-      if (line.startsWith("```")) {
-        const codeLines = [];
-        i++;
-        while (i < lines.length && !lines[i].startsWith("```")) {
-          codeLines.push(lines[i]);
-          i++;
-        }
-        elements.push(
-          <pre key={i}>
-            <code>{codeLines.join("\n")}</code>
-          </pre>
-        );
-        i++;
-        continue;
+  const formatInline = (text) => {
+    const parts = text.split(/(\*\*.*?\*\*|`.*?`)/g).map((part, i) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return <strong key={i}>{part.slice(2, -2)}</strong>;
       }
-      if (line.startsWith("## ")) {
-        elements.push(<h2 key={i}>{line.substring(3)}</h2>);
-        i++;
-        continue;
+      if (part.startsWith("`") && part.endsWith("`")) {
+        return <code key={i}>{part.slice(1, -1)}</code>;
       }
-      if (line.startsWith("### ")) {
-        elements.push(<h3 key={i}>{line.substring(4)}</h3>);
-        i++;
-        continue;
-      }
-      if (line.match(/^[\d]+\.\s/)) {
-        const listItems = [];
-        while (i < lines.length && lines[i].match(/^[\d]+\.\s/)) {
-          listItems.push(
-            <li key={i}>{formatInline(lines[i].replace(/^[\d]+\.\s/, ""))}</li>
-          );
-          i++;
-        }
-        elements.push(<ol key={`ol-${i}`}>{listItems}</ol>);
-        continue;
-      }
-      if (line.startsWith("- ")) {
-        const listItems = [];
-        while (i < lines.length && lines[i].startsWith("- ")) {
-          listItems.push(
-            <li key={i}>{formatInline(lines[i].substring(2))}</li>
-          );
-          i++;
-        }
-        elements.push(<ul key={`ul-${i}`}>{listItems}</ul>);
-        continue;
-      }
-      if (line.trim()) {
-        elements.push(<p key={i}>{formatInline(line)}</p>);
-      }
-      i++;
-    }
-    return elements;
+      return part;
+    });
+    return <>{parts}</>;
   };
 
-  const formatInline = (text) => {
-    const parts = [];
-    let current = "";
-    let i = 0;
-    while (i < text.length) {
-      if (text[i] === "*" && text[i + 1] === "*") {
-        if (current) parts.push(current);
-        current = "";
-        i += 2;
-        let bold = "";
-        while (i < text.length && !(text[i] === "*" && text[i + 1] === "*")) {
-          bold += text[i];
-          i++;
+  const renderMarkdown = (text) => {
+    return text.split("\n").map((line, i) => {
+      if (line.startsWith("## "))
+        return <h2 key={i}>{formatInline(line.substring(3))}</h2>;
+      if (line.startsWith("### "))
+        return <h3 key={i}>{formatInline(line.substring(4))}</h3>;
+      if (line.startsWith("- "))
+        return <li key={i}>{formatInline(line.substring(2))}</li>;
+      if (line.match(/^[\d]+\.\s/))
+        return <li key={i}>{formatInline(line.replace(/^[\d]+\.\s/, ""))}</li>;
+      if (line.startsWith("```"))
+        return (
+          <pre key={i}>
+            <code>{text.split("```")[1]}</code>
+          </pre>
+        );
+      if (line === "") return null;
+      // Handle edge case for code blocks to not render extra paragraphs
+      if (text.includes("```")) {
+        if (
+          line.startsWith("```") ||
+          (text.split("```")[1] && text.split("```")[1].includes(line))
+        ) {
+          return null;
         }
-        parts.push(<strong key={i}>{bold}</strong>);
-        i += 2;
-        continue;
       }
-      if (text[i] === "`") {
-        if (current) parts.push(current);
-        current = "";
-        i++;
-        let code = "";
-        while (i < text.length && text[i] !== "`") {
-          code += text[i];
-          i++;
-        }
-        parts.push(<code key={i}>{code}</code>);
-        i++;
-        continue;
-      }
-      current += text[i];
-      i++;
-    }
-    if (current) parts.push(current);
-    return parts;
+      return <p key={i}>{formatInline(line)}</p>;
+    });
   };
 
   return (

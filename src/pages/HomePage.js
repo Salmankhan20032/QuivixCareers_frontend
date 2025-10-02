@@ -46,7 +46,7 @@ const HomePage = () => {
       try {
         const [internshipsResponse, myInternshipsResponse] = await Promise.all([
           axiosInstance.get("/api/internships/"),
-          axiosInstance.get("/api/internships/my-internships/"),
+          axiosInstance.get("/api/internships/profile/"),
         ]);
 
         setAllInternships(internshipsResponse.data);

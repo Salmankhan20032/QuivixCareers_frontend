@@ -1,7 +1,12 @@
 // src/App.js
 
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 
 // CONTEXT PROVIDERS
 import { AuthProvider } from "./contexts/AuthContext";
@@ -9,14 +14,12 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 
 // ROUTING UTILITIES
 import PrivateRoute from "./utils/PrivateRoute";
-
-// We need the useAuth hook here to check if a user is logged in
 import useAuth from "./hooks/useAuth";
 
 // CORE COMPONENTS
 import AppNavbar from "./components/Navbar";
 import FloatingAIButton from "./components/FloatingAIButton";
-import Footer from "./components/Footer"; // <-- 1. IMPORT THE NEW FOOTER
+import Footer from "./components/Footer";
 
 // PAGE COMPONENTS
 import HomePage from "./pages/HomePage";
@@ -36,16 +39,27 @@ import BlazeAIPage from "./pages/BlazeAIPage";
 // GLOBAL STYLES
 import "./App.css";
 
-// We must wrap the logic in a small component because hooks can only be called inside components.
 const AppContent = () => {
-  // Get the user object from our authentication context
   const { user } = useAuth();
+  const location = useLocation();
+
+  // --- ADD BLAZE AI TO THIS LIST ---
+  // These pages will have a focused, full-screen layout.
+  const pagesWithoutLayout = [
+    "/login",
+    "/register",
+    "/verify-otp",
+    "/onboarding",
+    "/blaze-ai", // Add the Blaze AI page here
+  ];
+
+  const showLayout = !pagesWithoutLayout.includes(location.pathname);
 
   return (
-    // <-- 2. ADD A WRAPPER DIV FOR PROPER FOOTER PLACEMENT -->
     <div className="app-container">
-      <AppNavbar />
-      <main>
+      {showLayout && <AppNavbar />}
+
+      <main className={showLayout ? "" : "full-page-content"}>
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
@@ -54,7 +68,7 @@ const AppContent = () => {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
 
-          {/* Protected Routes (require login) */}
+          {/* Protected Routes */}
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/internships" element={<InternshipsListPage />} />
@@ -67,11 +81,11 @@ const AppContent = () => {
           </Route>
         </Routes>
       </main>
-      {/* This is the new, correct way. It simply checks if a user exists.
-          If 'user' is an object, it's true, and the button will be rendered.
-          If 'user' is null, it's false, and nothing will be rendered. */}
-      {user && <FloatingAIButton />}
-      <Footer /> {/* <-- 3. ADD THE FOOTER COMPONENT HERE --> */}
+
+      {/* Show floating AI button only on layout pages and when logged in */}
+      {showLayout && user && <FloatingAIButton />}
+
+      {showLayout && <Footer />}
     </div>
   );
 };

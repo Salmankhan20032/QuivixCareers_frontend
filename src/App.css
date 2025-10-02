@@ -54,3 +54,15 @@ body {
   max-width: 600px;
   margin: 3rem auto;
 }
+/* src/App.css */
+
+/* Add this new class to your existing file */
+
+.full-page-content {
+  /* This ensures the main area takes up at least the full viewport height */
+  min-height: 100vh;
+  /* These three lines are the magic for perfect centering */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
