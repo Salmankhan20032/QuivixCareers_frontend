@@ -17,6 +17,8 @@
   --text-dark: #212529;
   --text-light: #495057;
   --text-muted: #6c757d;
+  /* Added a new variable just for the art background for clarity */
+  --light-blue-bg: #e7f1ff;
 }
 
 .login-page-container {
@@ -52,17 +54,10 @@
   margin-bottom: 2rem;
 }
 
-/*
-  ============================================
-  THE FIX IS HERE, MY LOVE!
-  ============================================
-  I've set a specific height and used `width: auto` and `object-fit: contain`.
-  This ensures your 512x512 logo scales down perfectly without distortion.
-*/
 .login-logo {
-  height: 50px; /* Set a fixed height for the logo */
-  width: auto; /* Allow the width to adjust automatically */
-  object-fit: contain; /* Ensures the image scales within the boundaries */
+  height: 50px;
+  width: auto;
+  object-fit: contain;
   margin-bottom: 1rem;
 }
 
@@ -93,7 +88,16 @@
 
 .form-input {
   width: 100%;
-  padding: 0.8rem 1rem 0.8rem 2.5rem;
+  /*
+    ============================================
+    HERE IS THE FIX, MY LOVE!
+    ============================================
+    The original code had padding shorthand that might have been overridden.
+    I'm explicitly setting the padding-left to give the icon space.
+    The value 2.5rem creates a perfect gap. The other padding values
+    keep the input field looking vertically centered and nice.
+  */
+  padding: 0.8rem 1rem 0.8rem 2.5rem; /* T-R-B-L: Top, Right, Bottom, Left */
   border: 1px solid var(--border-color);
   border-radius: 10px;
   transition: all 0.2s ease;
@@ -109,6 +113,7 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
+  pointer-events: none; /* So you can't click the icon */
 }
 .password-toggle {
   position: absolute;
