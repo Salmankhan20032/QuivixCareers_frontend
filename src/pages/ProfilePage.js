@@ -1,6 +1,6 @@
 // src/pages/ProfilePage.js
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import {
@@ -19,8 +19,8 @@ import {
   PencilFill,
   Journals,
   RocketTakeoff,
-  TrophyFill, // <-- NEW ICON
-  Download, // <-- NEW ICON
+  TrophyFill,
+  Download,
 } from "react-bootstrap-icons";
 import axiosInstance from "../api/axiosInstance";
 import "./ProfilePage.css";
@@ -28,7 +28,11 @@ import "./ProfilePage.css";
 const ProfilePage = () => {
   const { user, setUser } = useAuth();
   const [formData, setFormData] = useState({
-    /* State for the form */
+    full_name: "",
+    nationality: "",
+    university: "",
+    major: "",
+    interest: "",
   });
   const [profilePic, setProfilePic] = useState(null);
   const [preview, setPreview] = useState("");
@@ -38,38 +42,35 @@ const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [myInternships, setMyInternships] = useState([]);
 
-  // Combines previous fetching logic into one more efficient call
-  const fetchAllData = useCallback(async () => {
-    try {
-      if (!user) {
-        // Prevent fetching if user is not loaded yet
-        return;
-      }
-      // Set loading to true only when starting to fetch
+  // Fetch profile and internships data on mount
+  useEffect(() => {
+    const fetchData = async () => {
       setLoading(true);
+      try {
+        const [profileRes, internshipsRes] = await Promise.all([
+          axiosInstance.get("/api/auth/profile/"),
+          axiosInstance.get("/api/internships/my-internships/"),
+        ]);
+        setUser(profileRes.data);
+        localStorage.setItem("user", JSON.stringify(profileRes.data));
+        setMyInternships(internshipsRes.data);
+      } catch (err) {
+        setError("Could not load profile data.");
+        console.error("Failed to fetch page data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      const [profileRes, internshipsRes] = await Promise.all([
-        axiosInstance.get("/api/auth/profile/"),
-        axiosInstance.get("/api/internships/my-internships/"),
-      ]);
-
-      const freshUserData = profileRes.data;
-      setUser(freshUserData);
-      localStorage.setItem("user", JSON.stringify(freshUserData));
-      setMyInternships(internshipsRes.data);
-    } catch (err) {
-      setError("Could not load the latest profile data.");
-      console.error("Failed to fetch page data", err);
-    } finally {
+    if (user?.id) {
+      fetchData();
+    } else {
       setLoading(false);
     }
-  }, [setUser, user]); // Dependency array ensures it refetches if user context changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // Only depend on user.id to prevent infinite loops
 
-  useEffect(() => {
-    fetchAllData();
-  }, [fetchAllData]);
-
-  // This effect populates the form whenever the user data changes
+  // Populate form when user data changes
   useEffect(() => {
     if (user) {
       setFormData({
@@ -85,11 +86,11 @@ const ProfilePage = () => {
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 3 * 1024 * 1024) {
-        // 3 MB check
         setError("File size must be less than 3MB.");
         return;
       }
@@ -105,12 +106,10 @@ const ProfilePage = () => {
     setError("");
     setSuccess("");
     const apiFormData = new FormData();
-    // Appending all form data
     Object.keys(formData).forEach((key) =>
       apiFormData.append(key, formData[key])
     );
     if (profilePic) apiFormData.append("profile_picture", profilePic);
-
     try {
       const response = await axiosInstance.put(
         "/api/auth/profile/",
@@ -128,7 +127,6 @@ const ProfilePage = () => {
     }
   };
 
-  // --- MODIFICATION: Splitting internships into ongoing and completed ---
   const ongoingInternships = useMemo(
     () =>
       myInternships.filter(
@@ -150,15 +148,10 @@ const ProfilePage = () => {
     "Cloud & DevOps",
   ];
 
-  if (loading && !user) {
-    // Show full-page loader only on initial load
+  if (loading && !myInternships.length) {
     return (
       <div className="vh-100 d-flex align-items-center justify-content-center">
-        {" "}
-        <Spinner
-          animation="border"
-          style={{ width: "3rem", height: "3rem" }}
-        />{" "}
+        <Spinner animation="border" style={{ width: "3rem", height: "3rem" }} />
       </div>
     );
   }
@@ -176,7 +169,6 @@ const ProfilePage = () => {
             {success}
           </Alert>
         )}
-
         <Card className="profile-header-card mb-4">
           <Row className="align-items-center">
             <Col md={3} className="text-center mb-4 mb-md-0">
@@ -237,11 +229,8 @@ const ProfilePage = () => {
             </Col>
           </Row>
         </Card>
-
-        {/* The form JSX remains exactly the same as you provided */}
         <Form onSubmit={handleSubmit}>
           <Row className="g-4">
-            {/* Full Name */}
             <Col md={6} lg={4}>
               <Card className="info-card h-100">
                 <div className="info-label">👤 Full Name</div>
@@ -259,7 +248,6 @@ const ProfilePage = () => {
                 )}
               </Card>
             </Col>
-            {/* Other form fields... (Nationality, University, etc.) */}
             <Col md={6} lg={4}>
               <Card className="info-card h-100">
                 <div className="info-label">🌍 Nationality</div>
@@ -336,8 +324,6 @@ const ProfilePage = () => {
             </Col>
           </Row>
         </Form>
-
-        {/* ONGOING INTERNSHIPS (Your existing section, preserved perfectly) */}
         <div className="section-header mt-5">
           <RocketTakeoff size={28} />
           <h2 className="section-title">Ongoing Internships</h2>
@@ -406,8 +392,6 @@ const ProfilePage = () => {
             </Button>
           </div>
         )}
-
-        {/* --- NEW SECTION: COMPLETED PROGRAMS --- */}
         <div className="section-header mt-5">
           <TrophyFill size={28} />
           <h2 className="section-title">Completed Programs & Achievements</h2>

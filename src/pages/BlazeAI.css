@@ -300,3 +300,35 @@
   text-align: center;
   margin-top: 0.5rem;
 }
+@media (max-width: 768px) {
+  .blaze-empty-content {
+    padding: 0 1.5rem; /* Add more side padding on mobile */
+  }
+  .blaze-logo {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+  .blaze-title {
+    font-size: 1.75rem; /* Make the main title smaller */
+  }
+  .blaze-suggestions {
+    grid-template-columns: 1fr;
+  }
+  .blaze-messages-container {
+    padding: 1rem; /* Reduce padding on mobile to give more space */
+  }
+  .blaze-message-text {
+    font-size: 14px; /* Slightly smaller text for better readability */
+  }
+  .blaze-input-container {
+    padding: 0.75rem; /* Tighter padding for the input area */
+  }
+  .blaze-textarea {
+    padding: 0.6rem 2.75rem 0.6rem 0.75rem; /* Adjust padding for smaller button */
+  }
+  .blaze-send-button {
+    bottom: 0.4rem;
+    right: 0.4rem;
+    padding: 0.4rem;
+  }
+}
