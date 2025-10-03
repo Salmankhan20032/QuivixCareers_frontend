@@ -10,7 +10,7 @@ const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 
 // --- THE CRITICAL FIX IS HERE ---
 // "gemini-1.5-flash-latest" is the correct, current name for Google's fast model.
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 const BlazeAIPage = () => {
   const [messages, setMessages] = useState([]);
