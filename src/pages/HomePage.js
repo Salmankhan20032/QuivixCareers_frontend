@@ -1,5 +1,3 @@
-// src/pages/HomePage.js
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
@@ -10,28 +8,65 @@ import {
   Card,
   Spinner,
   Alert,
-  Badge, // Restored because it's used in the Tech News section
+  Badge,
   Button,
 } from "react-bootstrap";
 import useAuth from "../hooks/useAuth";
 import InternshipCard from "../components/InternshipCard";
 import {
-  Newspaper, // Restored
+  Newspaper,
   Briefcase,
   Star,
-  GraphUpArrow, // Restored
+  GraphUpArrow,
   Award,
-  Clock, // Restored
+  Clock,
   ArrowRight,
   TrophyFill,
   RocketTakeoff,
-  Grid3x3GapFill, // Added for the new section
+  Grid3x3GapFill,
+  // --- NEW ICONS FOR THE NEW SECTION ---
+  Lightbulb,
+  CodeSlash,
+  Robot,
+  ShieldLockFill,
+  CloudFill,
 } from "react-bootstrap-icons";
 import "./HomePage.css";
 
+// --- NEW: Hardcoded data for the Top Fields section ---
+const topFields = [
+  {
+    field: "Web Development",
+    icon: <CodeSlash size={24} />,
+    description: "Build modern, responsive websites and web applications.",
+    color: "#007bff",
+    link: "/internships?field=Web%20Development",
+  },
+  {
+    field: "AI & Machine Learning",
+    icon: <Robot size={24} />,
+    description: "Dive into the world of intelligent systems and data.",
+    color: "#6f42c1",
+    link: "/internships?field=AI%20%26%20Machine%20Learning",
+  },
+  {
+    field: "Cyber Security",
+    icon: <ShieldLockFill size={24} />,
+    description: "Protect digital assets and learn ethical hacking.",
+    color: "#dc3545",
+    link: "/internships?field=Cyber%20Security",
+  },
+  {
+    field: "Cloud Computing",
+    icon: <CloudFill size={24} />,
+    description: "Master scalable infrastructure with AWS, Azure, and GCP.",
+    color: "#fd7e14",
+    link: "/internships?field=Cloud%20Computing",
+  },
+];
+
 const HomePage = () => {
   const { user } = useAuth();
-
   const [allInternships, setAllInternships] = useState([]);
   const [myEnrollments, setMyEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +98,6 @@ const HomePage = () => {
     () => new Set(myEnrollments.map((e) => e.internship.id)),
     [myEnrollments]
   );
-
   const ongoingInternships = useMemo(
     () =>
       myEnrollments.filter(
@@ -71,7 +105,6 @@ const HomePage = () => {
       ),
     [myEnrollments]
   );
-
   const recommendedInternships = useMemo(
     () => allInternships.filter((internship) => !appliedIds.has(internship.id)),
     [allInternships, appliedIds]
@@ -100,7 +133,6 @@ const HomePage = () => {
 
   return (
     <div className="homepage">
-      {/* --- Restored Full Hero Section --- */}
       <div className="hero-section">
         <Container>
           <Row className="align-items-center">
@@ -196,7 +228,6 @@ const HomePage = () => {
       </div>
 
       <Container className="content-section">
-        {/* --- Restored Full Tech News Section --- */}
         <section className="home-section">
           <div className="section-header">
             <div className="section-title-wrapper">
@@ -253,6 +284,38 @@ const HomePage = () => {
             ))}
           </Row>
         </section>
+
+        {/* --- NEW: TOP INTERNSHIP FIELDS SECTION --- */}
+        <section className="home-section">
+          <div className="section-header">
+            <div className="section-title-wrapper">
+              <Lightbulb className="section-icon" />
+              <h2 className="section-title">Top Internship Fields</h2>
+            </div>
+          </div>
+          <Row xs={6} md={4} lg={3} className="g-4">
+            {topFields.map((field) => (
+              <Col key={field.field}>
+                <Card className="field-card">
+                  <Card.Body>
+                    <div
+                      className="field-icon-wrapper"
+                      style={{ backgroundColor: field.color }}
+                    >
+                      {field.icon}
+                    </div>
+                    <h4 className="field-title">{field.field}</h4>
+                    <p className="field-description">{field.description}</p>
+                    <Link to={field.link} className="field-link">
+                      View Internships <ArrowRight />
+                    </Link>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </section>
+        {/* --- END: TOP INTERNSHIP FIELDS SECTION --- */}
 
         {loading ? (
           <div className="text-center py-5">
