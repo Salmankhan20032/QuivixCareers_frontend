@@ -13,7 +13,7 @@ import {
   Alert,
   Badge,
   ProgressBar,
-  Spinner, // Make sure Spinner is imported
+  Spinner,
 } from "react-bootstrap";
 import Loader from "../components/Loader";
 import { useNotifications } from "../contexts/NotificationContext";
@@ -25,26 +25,19 @@ import {
   FaClock,
   FaArrowRight,
   FaExternalLinkAlt,
+  FaExclamationTriangle,
 } from "react-icons/fa";
-
-// The CSS import is kept as you have it in your file.
-// import "./InternshipDetailPage.css";
 
 const InternshipDetailPage = () => {
   const { id: internshipId } = useParams();
   const { addNotification } = useNotifications();
 
-  // State for data fetched from API
   const [internship, setInternship] = useState(null);
   const [userEnrollment, setUserEnrollment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // State for user progress & UI control
   const [completedSteps, setCompletedSteps] = useState(new Set());
   const [timeLeft, setTimeLeft] = useState({});
-
-  // State for the submission form
   const [projectLink, setProjectLink] = useState("");
   const [fullyCompleted, setFullyCompleted] = useState("yes");
   const [experience, setExperience] = useState("");
@@ -69,9 +62,6 @@ const InternshipDetailPage = () => {
         if (enrollment) {
           setInternship(internshipRes.data);
           setUserEnrollment(enrollment);
-
-          // --- THE FIRST FIX: LOAD PROGRESS FROM THE BACKEND ---
-          // The backend now sends a 'completed_steps' array. We load it into our state.
           if (enrollment.completed_steps) {
             setCompletedSteps(new Set(enrollment.completed_steps));
           }
@@ -91,7 +81,6 @@ const InternshipDetailPage = () => {
     fetchInternshipData();
   }, [fetchInternshipData]);
 
-  // This countdown timer is correct and does not need changes.
   useEffect(() => {
     if (!userEnrollment || !internship) return;
     const interval = setInterval(() => {
@@ -118,21 +107,16 @@ const InternshipDetailPage = () => {
     return () => clearInterval(interval);
   }, [userEnrollment, internship]);
 
-  // --- THE SECOND FIX: SAVE PROGRESS TO THE BACKEND ---
   const handleMarkStepComplete = async (stepId) => {
-    // 1. Optimistic UI update for a fast user experience
     setCompletedSteps((prev) => new Set(prev).add(stepId));
     addNotification("Progress saved!");
-
     try {
-      // 2. Send the update to the backend API
       await axiosInstance.patch(
         `/api/internships/my-internships/${userEnrollment.id}/progress/`,
-        { completed_step_id: stepId } // The payload our backend expects
+        { completed_step_id: stepId }
       );
     } catch (err) {
-      // 3. If the API call fails, revert the state and notify the user
-      addNotification("Error: Could not save your progress to the server.", {
+      addNotification("Error: Could not save your progress.", {
         type: "error",
       });
       setCompletedSteps((prev) => {
@@ -140,7 +124,7 @@ const InternshipDetailPage = () => {
         newSet.delete(stepId);
         return newSet;
       });
-      console.error("Failed to save progress:", err);
+      console.error("Failed to save progress", err);
     }
   };
 
@@ -159,14 +143,13 @@ const InternshipDetailPage = () => {
         `/api/internships/my-internships/${userEnrollment.id}/submit/`,
         payload
       );
+      setProjectLink("");
       addNotification(
         `Project for '${internship.title}' submitted for review.`
       );
-      await fetchInternshipData(false); // Re-fetch data without full page loader to get updated status
+      await fetchInternshipData(false);
     } catch (err) {
-      setSubmitError(
-        "Submission failed. Please ensure the link is valid and try again."
-      );
+      setSubmitError("Submission failed. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -181,26 +164,29 @@ const InternshipDetailPage = () => {
     [internship]
   );
 
+  const canSubmit = useMemo(() => {
+    if (
+      !userEnrollment ||
+      !["in_progress", "rejected"].includes(userEnrollment.status)
+    )
+      return false;
+    return completedSteps.size >= learnSteps.length;
+  }, [completedSteps, learnSteps, userEnrollment]);
+
   const progressPercentage = useMemo(() => {
     if (!userEnrollment) return 0;
     const totalLearnSteps = learnSteps.length;
-    const completedLearnSteps = completedSteps.size;
-
+    if (totalLearnSteps === 0)
+      return userEnrollment.status === "accepted" ||
+        userEnrollment.status === "awaiting_evaluation"
+        ? 100
+        : 0;
     if (
       userEnrollment.status === "accepted" ||
       userEnrollment.status === "awaiting_evaluation"
-    ) {
+    )
       return 100;
-    }
-    if (totalLearnSteps === 0) return 0;
-
-    return (completedLearnSteps / totalLearnSteps) * 100;
-  }, [completedSteps, learnSteps, userEnrollment]);
-
-  const canSubmit = useMemo(() => {
-    if (!userEnrollment || userEnrollment.status !== "in_progress")
-      return false;
-    return completedSteps.size >= learnSteps.length;
+    return (completedSteps.size / totalLearnSteps) * 100;
   }, [completedSteps, learnSteps, userEnrollment]);
 
   if (loading) return <Loader message="Loading Internship..." />;
@@ -213,6 +199,8 @@ const InternshipDetailPage = () => {
       </Container>
     );
   if (!internship || !userEnrollment) return null;
+
+  const { status, latest_submission } = userEnrollment;
 
   return (
     <Container className="my-5">
@@ -328,8 +316,10 @@ const InternshipDetailPage = () => {
           <Col md={12}>
             <Card
               className={`shadow-sm border-0 ${
-                userEnrollment.status !== "in_progress"
+                status === "accepted"
                   ? "border-start border-success border-4"
+                  : status === "rejected"
+                  ? "border-start border-danger border-4"
                   : ""
               }`}
             >
@@ -337,16 +327,20 @@ const InternshipDetailPage = () => {
                 <div className="d-flex align-items-center mb-3">
                   <div
                     className={`rounded-circle p-3 me-3 ${
-                      userEnrollment.status !== "in_progress"
+                      status === "accepted"
                         ? "bg-success"
+                        : status === "rejected"
+                        ? "bg-danger"
                         : "bg-primary"
                     } bg-opacity-10`}
                   >
                     <FaTasks
                       size={24}
                       className={
-                        userEnrollment.status !== "in_progress"
+                        status === "accepted"
                           ? "text-success"
+                          : status === "rejected"
+                          ? "text-danger"
                           : "text-primary"
                       }
                     />
@@ -355,28 +349,47 @@ const InternshipDetailPage = () => {
                     <h4 className="mb-1">Final Step: {taskStep.title}</h4>
                     <Badge
                       bg={
-                        userEnrollment.status === "in_progress"
+                        status === "in_progress"
                           ? "secondary"
-                          : userEnrollment.status === "awaiting_evaluation"
+                          : status === "awaiting_evaluation"
                           ? "warning"
-                          : userEnrollment.status === "accepted"
+                          : status === "accepted"
                           ? "success"
                           : "danger"
                       }
                     >
-                      {userEnrollment.status
+                      {status
                         .replace("_", " ")
                         .replace(/\b\w/g, (c) => c.toUpperCase())}
                     </Badge>
                   </div>
                 </div>
-                {!canSubmit && userEnrollment.status === "in_progress" && (
+                {status === "rejected" && (
+                  <Alert variant="danger">
+                    <Alert.Heading>
+                      <FaExclamationTriangle className="me-2" />
+                      Project Needs Revision
+                    </Alert.Heading>
+                    <p>
+                      Your previous submission requires improvements. Please
+                      review the feedback, update your project, and submit
+                      again.
+                    </p>
+                    <hr />
+                    <p className="mb-0">
+                      <strong>Admin Feedback:</strong>{" "}
+                      {latest_submission?.evaluation_reason ||
+                        "No specific feedback was provided."}
+                    </p>
+                  </Alert>
+                )}
+                {!canSubmit && status === "in_progress" && (
                   <Alert variant="warning">
                     Please complete all learning steps above to unlock the
                     submission form.
                   </Alert>
                 )}
-                {userEnrollment.status === "in_progress" && (
+                {["in_progress", "rejected"].includes(status) && (
                   <Form
                     onSubmit={handleSubmission}
                     className={!canSubmit ? "blurred" : ""}
@@ -452,28 +465,20 @@ const InternshipDetailPage = () => {
                     >
                       {submitting ? (
                         <Spinner as="span" animation="border" size="sm" />
+                      ) : status === "rejected" ? (
+                        "Submit Again for Review"
                       ) : (
                         "Submit for Evaluation"
                       )}
                     </Button>
                   </Form>
                 )}
-                {userEnrollment.status === "awaiting_evaluation" && (
+                {status === "awaiting_evaluation" && (
                   <Alert variant="warning" className="mb-0">
                     <Alert.Heading>⏳ Awaiting Evaluation</Alert.Heading>
                     <p className="mb-0">
-                      Our team is reviewing your work. You'll be notified of the
-                      outcome soon.
-                    </p>
-                  </Alert>
-                )}
-                {userEnrollment.status === "rejected" && (
-                  <Alert variant="danger" className="mb-0">
-                    <Alert.Heading>⚠️ Project Needs Revision</Alert.Heading>
-                    <p className="mb-0">
-                      <strong>Admin Feedback:</strong>{" "}
-                      {userEnrollment.submission?.evaluation_reason ||
-                        "No specific feedback was provided."}
+                      Our team is reviewing your work and will get back to you
+                      soon.
                     </p>
                   </Alert>
                 )}
@@ -481,7 +486,7 @@ const InternshipDetailPage = () => {
             </Card>
           </Col>
         )}
-        {userEnrollment.status === "accepted" && (
+        {status === "accepted" && (
           <Col md={12}>
             <Card
               className="shadow-lg border-0 text-white text-center py-5 rounded-4"
@@ -522,4 +527,5 @@ const InternshipDetailPage = () => {
     </Container>
   );
 };
+
 export default InternshipDetailPage;
