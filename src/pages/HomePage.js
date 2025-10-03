@@ -8,23 +8,18 @@ import {
   Card,
   Spinner,
   Alert,
-  Badge,
   Button,
 } from "react-bootstrap";
 import useAuth from "../hooks/useAuth";
 import InternshipCard from "../components/InternshipCard";
 import {
-  Newspaper,
   Briefcase,
   Star,
-  GraphUpArrow,
   Award,
-  Clock,
   ArrowRight,
   TrophyFill,
   RocketTakeoff,
   Grid3x3GapFill,
-  // --- NEW ICONS FOR THE NEW SECTION ---
   Lightbulb,
   CodeSlash,
   Robot,
@@ -33,7 +28,7 @@ import {
 } from "react-bootstrap-icons";
 import "./HomePage.css";
 
-// --- NEW: Hardcoded data for the Top Fields section ---
+// Hardcoded data for the Top Fields section
 const topFields = [
   {
     field: "Web Development",
@@ -228,64 +223,7 @@ const HomePage = () => {
       </div>
 
       <Container className="content-section">
-        <section className="home-section">
-          <div className="section-header">
-            <div className="section-title-wrapper">
-              <Newspaper className="section-icon" />
-              <h2 className="section-title">Latest in Tech</h2>
-            </div>
-            <Badge
-              bg="primary"
-              className="d-flex align-items-center gap-2 px-3 py-2 fs-6"
-            >
-              <GraphUpArrow size={14} /> Trending
-            </Badge>
-          </div>
-          <Row xs={1} md={2} lg={4} className="g-4">
-            {[...Array(4)].map((_, index) => (
-              <Col key={index}>
-                <Card className="news-card">
-                  <div className="news-image-wrapper">
-                    <Card.Img
-                      variant="top"
-                      src={`https://picsum.photos/seed/${
-                        "tech" + index
-                      }/400/200`}
-                      className="news-image"
-                      alt="Tech News"
-                    />
-                    <div className="news-overlay">
-                      <Badge
-                        bg={["danger", "info", "warning", "success"][index]}
-                      >
-                        {["Hot", "Science", "Security", "Innovation"][index]}
-                      </Badge>
-                    </div>
-                  </div>
-                  <Card.Body>
-                    <Card.Title className="news-title">
-                      {
-                        [
-                          "Major AI Firm Releases Next-Gen Model",
-                          "Quantum Computing Achieves New Milestone",
-                          "Cybersecurity Alert: New Phishing Scam",
-                          "The Rise of Edge Native Applications",
-                        ][index]
-                      }
-                    </Card.Title>
-                  </Card.Body>
-                  <div className="news-footer">
-                    <small className="text-muted d-flex align-items-center gap-1">
-                      <Clock size={12} /> TechCrunch • {index + 2}h ago
-                    </small>
-                  </div>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </section>
-
-        {/* --- NEW: TOP INTERNSHIP FIELDS SECTION --- */}
+        {/* --- Top Internship Fields Section --- */}
         <section className="home-section">
           <div className="section-header">
             <div className="section-title-wrapper">
@@ -293,7 +231,8 @@ const HomePage = () => {
               <h2 className="section-title">Top Internship Fields</h2>
             </div>
           </div>
-          <Row xs={6} md={4} lg={3} className="g-4">
+          {/* --- FIX: Correct grid properties for 2x2 on mobile --- */}
+          <Row xs={2} md={2} lg={4} className="g-4">
             {topFields.map((field) => (
               <Col key={field.field}>
                 <Card className="field-card">
@@ -315,7 +254,6 @@ const HomePage = () => {
             ))}
           </Row>
         </section>
-        {/* --- END: TOP INTERNSHIP FIELDS SECTION --- */}
 
         {loading ? (
           <div className="text-center py-5">
@@ -355,7 +293,6 @@ const HomePage = () => {
                   </Row>
                 </section>
               )}
-
               <section className="home-section">
                 <div className="section-header">
                   <div className="section-title-wrapper">
@@ -391,7 +328,6 @@ const HomePage = () => {
                   </Alert>
                 )}
               </section>
-
               <section className="home-section">
                 <div className="section-header">
                   <div className="section-title-wrapper">
