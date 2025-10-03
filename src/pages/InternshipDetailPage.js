@@ -13,6 +13,7 @@ import {
   Alert,
   Badge,
   ProgressBar,
+  Spinner, // Make sure Spinner is imported
 } from "react-bootstrap";
 import Loader from "../components/Loader";
 import { useNotifications } from "../contexts/NotificationContext";
@@ -26,8 +27,11 @@ import {
   FaExternalLinkAlt,
 } from "react-icons/fa";
 
+// The CSS import is kept as you have it in your file.
+// import "./InternshipDetailPage.css";
+
 const InternshipDetailPage = () => {
-  const { id } = useParams();
+  const { id: internshipId } = useParams();
   const { addNotification } = useNotifications();
 
   // State for data fetched from API
@@ -48,35 +52,46 @@ const InternshipDetailPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  const fetchInternshipData = useCallback(async () => {
-    if (!loading) setLoading(true);
-    try {
-      const internshipRes = await axiosInstance.get(`/api/internships/${id}/`);
-      const myInternshipsRes = await axiosInstance.get(
-        "/api/internships/my-internships/"
-      );
-      const enrollment = myInternshipsRes.data.find(
-        (e) => e.internship.id === parseInt(id)
-      );
+  const fetchInternshipData = useCallback(
+    async (showLoader = true) => {
+      if (showLoader) setLoading(true);
+      try {
+        const internshipRes = await axiosInstance.get(
+          `/api/internships/${internshipId}/`
+        );
+        const myInternshipsRes = await axiosInstance.get(
+          "/api/internships/my-internships/"
+        );
+        const enrollment = myInternshipsRes.data.find(
+          (e) => e.internship.id === parseInt(internshipId)
+        );
 
-      if (enrollment) {
-        setInternship(internshipRes.data);
-        setUserEnrollment(enrollment);
-      } else {
-        setError("You are not enrolled in this internship.");
+        if (enrollment) {
+          setInternship(internshipRes.data);
+          setUserEnrollment(enrollment);
+
+          // --- THE FIRST FIX: LOAD PROGRESS FROM THE BACKEND ---
+          // The backend now sends a 'completed_steps' array. We load it into our state.
+          if (enrollment.completed_steps) {
+            setCompletedSteps(new Set(enrollment.completed_steps));
+          }
+        } else {
+          setError("You are not enrolled in this internship.");
+        }
+      } catch (err) {
+        setError("Failed to load internship details.");
+      } finally {
+        if (showLoader) setLoading(false);
       }
-    } catch (err) {
-      setError("Failed to load internship details.");
-    } finally {
-      setLoading(false);
-    }
-  }, [id, loading]);
+    },
+    [internshipId]
+  );
 
   useEffect(() => {
     fetchInternshipData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchInternshipData]);
 
+  // This countdown timer is correct and does not need changes.
   useEffect(() => {
     if (!userEnrollment || !internship) return;
     const interval = setInterval(() => {
@@ -103,9 +118,30 @@ const InternshipDetailPage = () => {
     return () => clearInterval(interval);
   }, [userEnrollment, internship]);
 
-  const handleMarkStepComplete = (stepId) => {
+  // --- THE SECOND FIX: SAVE PROGRESS TO THE BACKEND ---
+  const handleMarkStepComplete = async (stepId) => {
+    // 1. Optimistic UI update for a fast user experience
     setCompletedSteps((prev) => new Set(prev).add(stepId));
-    addNotification("Step marked as complete!");
+    addNotification("Progress saved!");
+
+    try {
+      // 2. Send the update to the backend API
+      await axiosInstance.patch(
+        `/api/internships/my-internships/${userEnrollment.id}/progress/`,
+        { completed_step_id: stepId } // The payload our backend expects
+      );
+    } catch (err) {
+      // 3. If the API call fails, revert the state and notify the user
+      addNotification("Error: Could not save your progress to the server.", {
+        type: "error",
+      });
+      setCompletedSteps((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(stepId);
+        return newSet;
+      });
+      console.error("Failed to save progress:", err);
+    }
   };
 
   const handleSubmission = async (e) => {
@@ -126,7 +162,7 @@ const InternshipDetailPage = () => {
       addNotification(
         `Project for '${internship.title}' submitted for review.`
       );
-      await fetchInternshipData();
+      await fetchInternshipData(false); // Re-fetch data without full page loader to get updated status
     } catch (err) {
       setSubmitError(
         "Submission failed. Please ensure the link is valid and try again."
@@ -146,23 +182,20 @@ const InternshipDetailPage = () => {
   );
 
   const progressPercentage = useMemo(() => {
-    if (!internship) return 0;
-    const totalSteps = learnSteps.length + (taskStep ? 1 : 0);
-    if (totalSteps === 0) return 0;
+    if (!userEnrollment) return 0;
+    const totalLearnSteps = learnSteps.length;
+    const completedLearnSteps = completedSteps.size;
 
-    let completedCount = completedSteps.size;
     if (
-      userEnrollment?.status === "accepted" ||
-      userEnrollment?.status === "awaiting_evaluation"
+      userEnrollment.status === "accepted" ||
+      userEnrollment.status === "awaiting_evaluation"
     ) {
-      completedCount = learnSteps.length + 1;
-    } else if (userEnrollment?.status === "rejected") {
-      completedCount = completedSteps.size;
+      return 100;
     }
+    if (totalLearnSteps === 0) return 0;
 
-    return (completedCount / totalSteps) * 100;
-    // --- FIX: Added 'internship' to the dependency array ---
-  }, [completedSteps, learnSteps, taskStep, userEnrollment, internship]);
+    return (completedLearnSteps / totalLearnSteps) * 100;
+  }, [completedSteps, learnSteps, userEnrollment]);
 
   const canSubmit = useMemo(() => {
     if (!userEnrollment || userEnrollment.status !== "in_progress")
@@ -181,7 +214,6 @@ const InternshipDetailPage = () => {
     );
   if (!internship || !userEnrollment) return null;
 
-  // ---- RENDER LOGIC ----
   return (
     <Container className="my-5">
       <Card className="mb-4 shadow-sm border-0">
@@ -212,7 +244,7 @@ const InternshipDetailPage = () => {
             <Col>
               <div className="mb-2">
                 <small className="text-muted fw-bold">
-                  Overall Progress: {Math.round(progressPercentage)}%
+                  Learning Progress: {Math.round(progressPercentage)}%
                 </small>
               </div>
               <ProgressBar
@@ -226,7 +258,6 @@ const InternshipDetailPage = () => {
           </Row>
         </Card.Body>
       </Card>
-
       <Row className="g-4">
         {learnSteps.map((step, index) => {
           const isCompleted = completedSteps.has(step.id);
@@ -293,7 +324,6 @@ const InternshipDetailPage = () => {
             </Col>
           );
         })}
-
         {taskStep && (
           <Col md={12}>
             <Card
@@ -340,14 +370,12 @@ const InternshipDetailPage = () => {
                     </Badge>
                   </div>
                 </div>
-
                 {!canSubmit && userEnrollment.status === "in_progress" && (
                   <Alert variant="warning">
                     Please complete all learning steps above to unlock the
                     submission form.
                   </Alert>
                 )}
-
                 {userEnrollment.status === "in_progress" && (
                   <Form
                     onSubmit={handleSubmission}
@@ -422,11 +450,14 @@ const InternshipDetailPage = () => {
                       size="lg"
                       disabled={!canSubmit || submitting}
                     >
-                      {submitting ? "Submitting..." : "Submit for Evaluation"}
+                      {submitting ? (
+                        <Spinner as="span" animation="border" size="sm" />
+                      ) : (
+                        "Submit for Evaluation"
+                      )}
                     </Button>
                   </Form>
                 )}
-
                 {userEnrollment.status === "awaiting_evaluation" && (
                   <Alert variant="warning" className="mb-0">
                     <Alert.Heading>⏳ Awaiting Evaluation</Alert.Heading>
@@ -450,7 +481,6 @@ const InternshipDetailPage = () => {
             </Card>
           </Col>
         )}
-
         {userEnrollment.status === "accepted" && (
           <Col md={12}>
             <Card
@@ -492,5 +522,4 @@ const InternshipDetailPage = () => {
     </Container>
   );
 };
-
 export default InternshipDetailPage;
