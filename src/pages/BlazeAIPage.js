@@ -1,16 +1,34 @@
 // src/pages/BlazeAIPage.js
 
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Sparkles, Loader2, User } from "lucide-react";
+import { Send, Sparkles, Loader2, User, Copy, Check } from "lucide-react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import "./BlazeAI.css"; // Assuming you are still using the custom CSS
+import "./BlazeAI.css";
 
 // Initialize the Gemini Model with your API key from the .env file
 const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 
-// --- THE CRITICAL FIX IS HERE ---
-// "gemini-1.5-flash-latest" is the correct, current name for Google's fast model.
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+// --- CRITICAL FIX: Use the correct, current model name ---
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+
+// --- NEW: Copy Button Component for Code Blocks ---
+const CopyButton = ({ textToCopy }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+    });
+  };
+
+  return (
+    <button onClick={handleCopy} className="blaze-copy-button">
+      {copied ? <Check size={14} /> : <Copy size={14} />}
+      {copied ? "Copied!" : "Copy code"}
+    </button>
+  );
+};
 
 const BlazeAIPage = () => {
   const [messages, setMessages] = useState([]);
@@ -25,13 +43,15 @@ const BlazeAIPage = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, loading]);
 
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height =
-        Math.min(textareaRef.current.scrollHeight, 200) + "px";
+      textareaRef.current.style.height = `${Math.min(
+        textareaRef.current.scrollHeight,
+        200
+      )}px`;
     }
   }, [input]);
 
@@ -42,27 +62,33 @@ const BlazeAIPage = () => {
     const userMessage = input.trim();
     setInput("");
 
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    // Add user message and a placeholder for AI's streaming response
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: userMessage },
+      { role: "assistant", content: "" }, // Placeholder for streaming
+    ]);
+
     setLoading(true);
 
     try {
       const systemPrompt = `You are Blaze AI by Quivix, a professional internship assistant.
 
-      CRITICAL IDENTITY RULES:
-      - If asked about your name, identity, creator, or "who are you": Always respond "I am Blaze AI by Quivix, your personal internship assistant."
-      - Never claim to be any other AI, including Gemini.
-      - Always maintain your identity as Blaze AI by Quivix.
+        CRITICAL IDENTITY RULES:
+        - If asked about your name, identity, creator, or "who are you": Always respond "I am Blaze AI by Quivix, your personal internship assistant."
+        - Never claim to be any other AI, including Gemini.
+        - Always maintain your identity as Blaze AI by Quivix.
 
-      Format all responses professionally with markdown:
-      - Use ## for main sections
-      - Use ### for subsections
-      - Use **bold** for key points
-      - Use \`code\` for inline code
-      - Use bullet points with -
-      - Use numbered lists with 1. 2. 3.
-      - Use code blocks with \`\`\`
+        Format all responses professionally with markdown:
+        - Use ## for main sections
+        - Use ### for subsections
+        - Use **bold** for key points
+        - Use \`code\` for inline code
+        - Use bullet points with -
+        - Use numbered lists with 1. 2. 3.
+        - Use code blocks with \`\`\`
 
-      Focus on topics related to: internships, career advice, cover letters, resumes, interview preparation, and explaining technical concepts for students and early-career professionals.`;
+        Focus on topics related to: internships, career advice, cover letters, resumes, interview preparation, and explaining technical concepts for students and early-career professionals.`;
 
       const chat = model.startChat({
         history: [
@@ -76,72 +102,39 @@ const BlazeAIPage = () => {
             ],
           },
         ],
-        generationConfig: { maxOutputTokens: 1000 },
+        generationConfig: { maxOutputTokens: 2000 },
       });
 
-      const result = await chat.sendMessage(userMessage);
-      const aiResponse = result.response.text();
+      // --- NEW: Implement Streaming Response ---
+      const result = await chat.sendMessageStream(userMessage);
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: aiResponse },
-      ]);
+      for await (const chunk of result.stream) {
+        const chunkText = chunk.text();
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          const lastMessage = newMessages[newMessages.length - 1];
+          lastMessage.content += chunkText;
+          return newMessages;
+        });
+      }
     } catch (err) {
       console.error("Error calling Gemini API:", err);
-      let errorMessage = "Unknown error";
+      let errorMessage = "An unknown error occurred.";
       if (err.message) {
+        // Extract user-friendly error from Gemini's response
         const match = err.message.match(/\[\d{3}\s\w+\]\s(.*)/);
         errorMessage = match ? match[1] : err.message;
       }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: `## Error Occurred\n\nI apologize, but I encountered an error connecting to the service. Please check your API key and ensure it is valid and has billing enabled.\n\n**Details**: ${errorMessage}`,
-        },
-      ]);
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        const lastMessage = newMessages[newMessages.length - 1];
+        lastMessage.content = `## Error Occurred\n\nI apologize, but I encountered an error. Please check your API key and ensure it is valid and has billing enabled.\n\n**Details**: ${errorMessage}`;
+        return newMessages;
+      });
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatInline = (text) => {
-    const parts = [];
-    let current = "";
-    let i = 0;
-    while (i < text.length) {
-      if (text[i] === "*" && text[i + 1] === "*") {
-        if (current) parts.push(current);
-        current = "";
-        i += 2;
-        let bold = "";
-        while (i < text.length && !(text[i] === "*" && text[i + 1] === "*")) {
-          bold += text[i];
-          i++;
-        }
-        parts.push(<strong key={i}>{bold}</strong>);
-        i += 2;
-        continue;
-      }
-      if (text[i] === "`") {
-        if (current) parts.push(current);
-        current = "";
-        i++;
-        let code = "";
-        while (i < text.length && text[i] !== "`") {
-          code += text[i];
-          i++;
-        }
-        parts.push(<code key={i}>{code}</code>);
-        i++;
-        continue;
-      }
-      current += text[i];
-      i++;
-    }
-    if (current) parts.push(current);
-    return parts;
   };
 
   const renderMarkdown = (text) => {
@@ -150,21 +143,31 @@ const BlazeAIPage = () => {
     let i = 0;
     while (i < lines.length) {
       const line = lines[i];
+      // Code Blocks
       if (line.startsWith("```")) {
+        const lang = line.substring(3).trim();
         const codeLines = [];
         i++;
         while (i < lines.length && !lines[i].startsWith("```")) {
           codeLines.push(lines[i]);
           i++;
         }
+        const codeString = codeLines.join("\n");
         elements.push(
-          <pre key={i}>
-            <code>{codeLines.join("\n")}</code>
-          </pre>
+          <div className="blaze-code-block" key={i}>
+            <div className="blaze-code-header">
+              <span>{lang || "code"}</span>
+              <CopyButton textToCopy={codeString} />
+            </div>
+            <pre>
+              <code>{codeString}</code>
+            </pre>
+          </div>
         );
         i++;
         continue;
       }
+      // Headings
       if (line.startsWith("## ")) {
         elements.push(<h2 key={i}>{line.substring(3)}</h2>);
         i++;
@@ -175,17 +178,8 @@ const BlazeAIPage = () => {
         i++;
         continue;
       }
-      if (line.match(/^[\d]+\.\s/)) {
-        const listItems = [];
-        while (i < lines.length && lines[i].match(/^[\d]+\.\s/)) {
-          listItems.push(
-            <li key={i}>{formatInline(lines[i].replace(/^[\d]+\.\s/, ""))}</li>
-          );
-          i++;
-        }
-        elements.push(<ol key={`ol-${i}`}>{listItems}</ol>);
-        continue;
-      }
+
+      // Lists (unordered)
       if (line.startsWith("- ")) {
         const listItems = [];
         while (i < lines.length && lines[i].startsWith("- ")) {
@@ -197,6 +191,19 @@ const BlazeAIPage = () => {
         elements.push(<ul key={`ul-${i}`}>{listItems}</ul>);
         continue;
       }
+      // Lists (ordered)
+      if (line.match(/^[\d]+\.\s/)) {
+        const listItems = [];
+        while (i < lines.length && lines[i].match(/^[\d]+\.\s/)) {
+          listItems.push(
+            <li key={i}>{formatInline(lines[i].replace(/^[\d]+\.\s/, ""))}</li>
+          );
+          i++;
+        }
+        elements.push(<ol key={`ol-${i}`}>{listItems}</ol>);
+        continue;
+      }
+      // Paragraphs
       if (line.trim()) {
         elements.push(<p key={i}>{formatInline(line)}</p>);
       }
@@ -205,119 +212,114 @@ const BlazeAIPage = () => {
     return elements;
   };
 
+  const formatInline = (text) => {
+    const parts = text.split(/(\*\*.*?\*\*|`.*?`)/g).map((part, index) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return <strong key={index}>{part.slice(2, -2)}</strong>;
+      }
+      if (part.startsWith("`") && part.endsWith("`")) {
+        return <code key={index}>{part.slice(1, -1)}</code>;
+      }
+      return part;
+    });
+    return parts;
+  };
+
   return (
     <div className="blaze-container">
+      <header className="blaze-header">
+        <div className="blaze-header-logo">
+          <Sparkles size={20} />
+        </div>
+        <h1 className="blaze-header-title">Blaze AI</h1>
+      </header>
       <div className="blaze-messages-area">
         {messages.length === 0 ? (
           <div className="blaze-empty-state">
-            <div className="blaze-empty-content">
-              <div className="blaze-logo">
-                <Sparkles className="w-10 h-10 text-white" />
-              </div>
-              <h1 className="blaze-title">Blaze AI</h1>
-              <p className="blaze-subtitle">by Quivix</p>
-              <div className="blaze-suggestions">
-                <button
-                  onClick={() =>
-                    setInput(
-                      "Write a cover letter for a software engineer internship"
-                    )
-                  }
-                  className="blaze-suggestion-card"
-                >
-                  <div className="blaze-suggestion-title">Cover Letter</div>
-                  <div className="blaze-suggestion-desc">
-                    Write a professional cover letter
-                  </div>
-                </button>
-                <button
-                  onClick={() =>
-                    setInput("What are common interview questions?")
-                  }
-                  className="blaze-suggestion-card"
-                >
-                  <div className="blaze-suggestion-title">Interview Prep</div>
-                  <div className="blaze-suggestion-desc">
-                    Practice interview questions
-                  </div>
-                </button>
-                <button
-                  onClick={() => setInput("Explain REST APIs in simple terms")}
-                  className="blaze-suggestion-card"
-                >
-                  <div className="blaze-suggestion-title">Learn Concepts</div>
-                  <div className="blaze-suggestion-desc">
-                    Understand technical topics
-                  </div>
-                </button>
-                <button
-                  onClick={() => setInput("How do I optimize my resume?")}
-                  className="blaze-suggestion-card"
-                >
-                  <div className="blaze-suggestion-title">Resume Tips</div>
-                  <div className="blaze-suggestion-desc">
-                    Optimize for ATS systems
-                  </div>
-                </button>
-              </div>
+            <div className="blaze-logo">
+              <Sparkles className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="blaze-title">Blaze AI</h1>
+            <p className="blaze-subtitle">Your Personal Internship Assistant</p>
+            <div className="blaze-suggestions">
+              <button
+                onClick={() =>
+                  setInput(
+                    "Write a cover letter for a software engineer internship"
+                  )
+                }
+                className="blaze-suggestion-card"
+              >
+                <div className="blaze-suggestion-title">Cover Letter</div>
+                <div className="blaze-suggestion-desc">
+                  Write a professional cover letter
+                </div>
+              </button>
+              <button
+                onClick={() => setInput("What are common interview questions?")}
+                className="blaze-suggestion-card"
+              >
+                <div className="blaze-suggestion-title">Interview Prep</div>
+                <div className="blaze-suggestion-desc">
+                  Practice interview questions
+                </div>
+              </button>
+              <button
+                onClick={() => setInput("Explain REST APIs in simple terms")}
+                className="blaze-suggestion-card"
+              >
+                <div className="blaze-suggestion-title">Learn Concepts</div>
+                <div className="blaze-suggestion-desc">
+                  Understand technical topics
+                </div>
+              </button>
+              <button
+                onClick={() => setInput("How do I optimize my resume?")}
+                className="blaze-suggestion-card"
+              >
+                <div className="blaze-suggestion-title">Resume Tips</div>
+                <div className="blaze-suggestion-desc">
+                  Optimize for ATS systems
+                </div>
+              </button>
             </div>
           </div>
         ) : (
           <div className="blaze-messages-container">
             {messages.map((msg, idx) => (
-              <div key={idx} className="blaze-message">
+              <div key={idx} className={`blaze-message-wrapper ${msg.role}`}>
                 <div className="blaze-message-content">
-                  <div
-                    className={`blaze-avatar ${
-                      msg.role === "user"
-                        ? "blaze-avatar-user"
-                        : "blaze-avatar-ai"
-                    }`}
-                  >
+                  <div className={`blaze-avatar ${msg.role}`}>
                     {msg.role === "user" ? (
-                      <User className="w-5 h-5 text-white" />
+                      <User size={20} />
                     ) : (
-                      <Sparkles className="w-5 h-5 text-white" />
+                      <Sparkles size={20} />
                     )}
                   </div>
-                  <div className="blaze-message-body">
-                    <div className="blaze-message-name">
-                      {msg.role === "user" ? "You" : "Blaze AI"}
-                    </div>
-                    <div className="blaze-message-text">
-                      {msg.role === "user" ? (
-                        <p>{msg.content}</p>
-                      ) : (
-                        renderMarkdown(msg.content)
+                  <div className={`blaze-message-body ${msg.role}`}>
+                    {msg.role === "user" ? (
+                      <p>{msg.content}</p>
+                    ) : (
+                      renderMarkdown(msg.content)
+                    )}
+                    {/* Blinking cursor for streaming effect */}
+                    {loading &&
+                      msg.role === "assistant" &&
+                      idx === messages.length - 1 && (
+                        <span className="blaze-cursor"></span>
                       )}
-                    </div>
                   </div>
                 </div>
               </div>
             ))}
-            {loading && (
-              <div className="blaze-message">
-                <div className="blaze-message-content">
-                  <div className="blaze-avatar blaze-avatar-ai">
-                    <Sparkles className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="blaze-message-body">
-                    <div className="blaze-message-name">Blaze AI</div>
-                    <div className="blaze-loading">
-                      <Loader2 className="blaze-spinner" />
-                      <span>Thinking...</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* This div is used to scroll to the bottom */}
             <div ref={messagesEndRef} />
           </div>
         )}
       </div>
       <div className="blaze-input-area">
         <div className="blaze-input-container">
-          <div className="blaze-input-wrapper">
+          <form onSubmit={handleSubmit} className="blaze-input-form">
             <textarea
               ref={textareaRef}
               value={input}
@@ -334,13 +336,17 @@ const BlazeAIPage = () => {
               disabled={loading}
             />
             <button
-              onClick={handleSubmit}
+              type="submit"
               disabled={!input.trim() || loading}
               className="blaze-send-button"
             >
-              <Send className="w-4 h-4" />
+              {loading ? (
+                <Loader2 className="blaze-spinner" size={18} />
+              ) : (
+                <Send size={18} />
+              )}
             </button>
-          </div>
+          </form>
           <p className="blaze-footer-text">
             Blaze AI by Quivix can make mistakes. Check important info.
           </p>
