@@ -1,6 +1,36 @@
-/* src/App.css */
+/* src/index.css or App.css */
+
 body {
-  background-color: #f8f9fa; /* A light grey background */
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* Default body background for other pages */
+body:not(.blaze-page) {
+  background-color: #f8f9fa;
 }
 
 .auth-form-container {
@@ -54,15 +84,18 @@ body {
   max-width: 600px;
   margin: 3rem auto;
 }
-/* src/App.css */
-
-/* Add this new class to your existing file */
 
 .full-page-content {
-  /* This ensures the main area takes up at least the full viewport height */
   min-height: 100vh;
-  /* These three lines are the magic for perfect centering */
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Blaze AI Full Screen Override */
+.blaze-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
 }

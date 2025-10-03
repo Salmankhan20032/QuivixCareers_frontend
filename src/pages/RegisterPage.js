@@ -1,5 +1,3 @@
-// src/pages/RegisterPage.js
-
 import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
@@ -13,7 +11,7 @@ import {
   EyeSlash,
   CheckCircleFill,
 } from "react-bootstrap-icons";
-import { nationalities } from "../utils/nationalities"; // Correctly import the list
+import { nationalities } from "../utils/nationalities";
 import "./RegisterPage.css";
 
 const RegisterPage = () => {
@@ -28,9 +26,7 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [receiveEmails, setReceiveEmails] = useState(true);
 
   const { registerUser } = useAuth();
 
@@ -46,7 +42,6 @@ const RegisterPage = () => {
       setError("Passwords do not match!");
       return;
     }
-
     if (passwordStrength.score < 2) {
       setError("Password is too weak. Please choose a stronger password.");
       return;
@@ -62,7 +57,11 @@ const RegisterPage = () => {
         formData.nationality
       );
     } catch (err) {
-      setError(err.message || "Registration failed. Please try again.");
+      const errorMessage =
+        err.response?.data?.detail ||
+        err.message ||
+        "Registration failed. Please try again.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -97,7 +96,7 @@ const RegisterPage = () => {
     <div className="register-page-container">
       <div className="register-grid">
         <div className="register-art-section">
-          <img src="/logo.png" alt="Quivix Logo" className="login-logo mb-4" />
+          <img src="/logo.png" alt="Quivix Logo" className="logo mb-4" />
           <h2 className="art-title">Join a Community of Innovators</h2>
           <ul className="feature-list">
             <li>
@@ -122,6 +121,13 @@ const RegisterPage = () => {
         </div>
 
         <div className="register-form-section">
+          {/* --- NEW: MOBILE-ONLY HEADER --- */}
+          <div className="mobile-header">
+            <img src="/logo.png" alt="Quivix Logo" className="logo" />
+            <h2 className="brand-title">QuivixCareers</h2>
+          </div>
+          {/* --- END MOBILE-ONLY HEADER --- */}
+
           <div className="register-header">
             <h1 className="register-title">Create Your Account</h1>
             <p className="register-subtitle">
@@ -143,7 +149,7 @@ const RegisterPage = () => {
                 <Form.Control
                   type="text"
                   name="fullName"
-                  className="form-input"
+                  className="form-control" /* Using standard bootstrap class */
                   value={fullName}
                   onChange={handleChange}
                   placeholder="John Doe"
@@ -159,7 +165,7 @@ const RegisterPage = () => {
                 <Form.Control
                   type="email"
                   name="email"
-                  className="form-input"
+                  className="form-control"
                   value={email}
                   onChange={handleChange}
                   placeholder="you@example.com"
@@ -174,7 +180,7 @@ const RegisterPage = () => {
                 <GlobeAmericas className="input-icon" size={18} />
                 <Form.Select
                   name="nationality"
-                  className="form-input"
+                  className="form-control"
                   value={nationality}
                   onChange={handleChange}
                   required
@@ -198,7 +204,7 @@ const RegisterPage = () => {
                 <Form.Control
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  className="form-input"
+                  className="form-control"
                   value={password}
                   onChange={handleChange}
                   placeholder="••••••••"
@@ -238,7 +244,7 @@ const RegisterPage = () => {
                 <Form.Control
                   type={showPassword2 ? "text" : "password"}
                   name="password2"
-                  className="form-input"
+                  className="form-control"
                   value={password2}
                   onChange={handleChange}
                   placeholder="••••••••"
@@ -259,25 +265,13 @@ const RegisterPage = () => {
                 <input
                   type="checkbox"
                   className="form-check-input"
-                  id="receiveEmails"
-                  checked={receiveEmails}
-                  onChange={(e) => setReceiveEmails(e.target.checked)}
-                />
-                <label className="form-check-label" htmlFor="receiveEmails">
-                  Receive emails about new programs.
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
                   id="acceptTerms"
                   checked={acceptTerms}
                   onChange={(e) => setAcceptTerms(e.target.checked)}
                   required
                 />
                 <label className="form-check-label" htmlFor="acceptTerms">
-                  I accept the <Link to="/terms">Terms</Link> and{" "}
+                  I accept the <Link to="/terms">Terms of Service</Link> and{" "}
                   <Link to="/privacy">Privacy Policy</Link>.
                 </label>
               </div>

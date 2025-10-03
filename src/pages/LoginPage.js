@@ -1,5 +1,3 @@
-// src/pages/LoginPage.js
-
 import React, { useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { Link } from "react-router-dom";
@@ -18,10 +16,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  // New state for checkboxes
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [receiveEmails, setReceiveEmails] = useState(true);
 
   const { loginUser } = useAuth();
 
@@ -71,6 +66,13 @@ const LoginPage = () => {
 
         {/* Right Side: Login Form */}
         <div className="login-form-section">
+          {/* --- NEW: MOBILE-ONLY HEADER --- */}
+          <div className="mobile-header">
+            <img src="/logo.png" alt="Quivix Logo" className="login-logo" />
+            <h2 className="brand-title">QuivixCareers</h2>
+          </div>
+          {/* --- END MOBILE-ONLY HEADER --- */}
+
           <div className="login-header">
             <h1 className="login-title">Welcome Back!</h1>
             <p className="login-subtitle">
@@ -119,20 +121,7 @@ const LoginPage = () => {
               </div>
             </Form.Group>
 
-            {/* --- NEW CHECKBOXES --- */}
             <div className="form-group">
-              <div className="form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="receiveEmails"
-                  checked={receiveEmails}
-                  onChange={(e) => setReceiveEmails(e.target.checked)}
-                />
-                <label className="form-check-label" htmlFor="receiveEmails">
-                  Receive emails about new programs and marketing.
-                </label>
-              </div>
               <div className="form-check">
                 <input
                   type="checkbox"

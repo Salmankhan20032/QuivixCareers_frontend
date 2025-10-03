@@ -25,6 +25,8 @@
   --success-green: #38a169;
   --success-green-border: #38a169;
   --success-green-bg-light: #f0fff4;
+  /* --- NEW --- Added a specific color for the profile border */
+  --light-blue-border: #a9d2ff;
 }
 
 /* Main Navbar Styling */
@@ -198,7 +200,8 @@
   justify-content: center;
   width: 42px;
   height: 42px;
-  border-radius: 12px;
+  /* --- MODIFIED --- */
+  border-radius: 50%; /* Make the wrapper circular */
   background: transparent;
   border: 1px solid var(--border-color);
   color: var(--text-light);
@@ -232,21 +235,25 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 10px;
+  /* --- MODIFIED --- */
+  border-radius: 50%; /* Make the image itself circular */
 }
 .profile-icon-wrapper {
-  padding: 5px;
-} /* Padding for the image */
+  /* --- MODIFIED --- */
+  padding: 3px; /* Adjust padding for the circular look */
+}
 .profile-placeholder {
   color: var(--text-light);
 }
 
 /* Mobile profile image styling */
 .mobile-profile-img {
-  width: 24px;
-  height: 24px;
+  width: 28px; /* Slightly larger for better visibility */
+  height: 28px;
   object-fit: cover;
   border-radius: 50%;
+  /* --- NEW --- Added the requested light blue border */
+  border: 2px solid var(--light-blue-border);
 }
 
 /* Dropdown Menus (Shared Styles) */
@@ -315,9 +322,9 @@
   margin-bottom: 0.5rem;
   color: var(--text-dark);
   line-height: 1.5;
-  white-space: normal; /* Explicitly allow wrapping */
-  overflow-wrap: break-word; /* Break long words if they overflow */
-  word-break: break-word; /* Alternative for wider compatibility */
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .notification-time {
@@ -340,7 +347,7 @@
   font-weight: 500;
 }
 .notification-item.status-success:hover {
-  background-color: #e6fffa; /* A slightly different green for hover */
+  background-color: #e6fffa;
 }
 .notification-item.status-rejected {
   border-left-color: var(--danger-red-border);
@@ -351,7 +358,7 @@
   font-weight: 500;
 }
 .notification-item.status-rejected:hover {
-  background-color: #fed7d7; /* A slightly different red for hover */
+  background-color: #fed7d7;
 }
 
 .dropdown-item-custom {
@@ -460,7 +467,6 @@
     font-size: 1.15rem;
   }
 
-  /* Main content is now just a block element on mobile */
   .main-nav-content {
     flex-direction: column;
   }
@@ -501,7 +507,6 @@
     border-top: 1px solid var(--border-color);
   }
 
-  /* Style dropdown toggles to look like other nav items */
   .notification-dropdown,
   .profile-dropdown {
     width: 100%;

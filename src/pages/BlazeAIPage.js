@@ -42,6 +42,22 @@ const BlazeAIPage = () => {
   };
 
   useEffect(() => {
+    // Add class to body for full-screen styling
+    document.body.classList.add("blaze-page");
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      // Cleanup when component unmounts
+      document.body.classList.remove("blaze-page");
+      document.body.style.margin = "";
+      document.body.style.padding = "";
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  useEffect(() => {
     scrollToBottom();
   }, [messages, loading]);
 
