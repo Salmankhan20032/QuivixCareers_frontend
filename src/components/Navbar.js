@@ -20,6 +20,23 @@ import { PersonCircle, BellFill, Search } from "react-bootstrap-icons";
 import axiosInstance from "../api/axiosInstance";
 import "./Navbar.css";
 
+// --- NEW: Custom hook to detect screen size for responsive rendering ---
+const useMediaQuery = (query) => {
+  const [matches, setMatches] = useState(window.matchMedia(query).matches);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
+  }, [matches, query]);
+
+  return matches;
+};
+
 const AppNavbar = () => {
   const { user, logoutUser } = useAuth();
   const { notifications, markAllAsRead, unreadCount } = useNotifications();
@@ -32,17 +49,18 @@ const AppNavbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [navExpanded, setNavExpanded] = useState(false);
 
+  // --- Use the hook to determine layout ---
+  const isMobile = useMediaQuery("(max-width: 991px)");
+
   const searchContainerRef = useRef(null);
   const mobileSearchContainerRef = useRef(null);
   const searchTimeoutRef = useRef(null);
 
-  // Fetch search suggestions with debouncing
   useEffect(() => {
     if (!searchQuery.trim()) {
       setSuggestions([]);
       return;
     }
-
     const fetchSuggestions = async () => {
       setIsSearching(true);
       try {
@@ -57,23 +75,13 @@ const AppNavbar = () => {
         setIsSearching(false);
       }
     };
-
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    searchTimeoutRef.current = setTimeout(() => {
-      fetchSuggestions();
-    }, 300);
-
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(fetchSuggestions, 300);
     return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     };
   }, [searchQuery]);
 
-  // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -85,14 +93,10 @@ const AppNavbar = () => {
         setSuggestions([]);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setNavExpanded(false);
     setShowSearch(false);
@@ -166,7 +170,6 @@ const AppNavbar = () => {
           <Spinner size="sm" animation="border" variant="primary" />
         </ListGroup.Item>
       )}
-
       {!isSearching &&
         suggestions.length > 0 &&
         suggestions.map((s) => (
@@ -180,10 +183,9 @@ const AppNavbar = () => {
             <span>{s.title}</span>
           </ListGroup.Item>
         ))}
-
       {!isSearching && suggestions.length === 0 && searchQuery && (
         <ListGroup.Item className="suggestion-item text-muted text-center">
-          No results found for "{searchQuery}"
+          No results for "{searchQuery}"
         </ListGroup.Item>
       )}
     </ListGroup>
@@ -215,172 +217,204 @@ const AppNavbar = () => {
           </div>
 
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="nav-links">
-              <Nav.Link
-                as={Link}
-                to="/"
-                className={`nav-item-custom ${isActive("/") ? "active" : ""}`}
-              >
-                Home
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/internships"
-                className={`nav-item-custom ${
-                  isActive("/internships") ? "active" : ""
-                }`}
-              >
-                Internships
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/about"
-                className={`nav-item-custom ${
-                  isActive("/about") ? "active" : ""
-                }`}
-              >
-                About
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/contact"
-                className={`nav-item-custom ${
-                  isActive("/contact") ? "active" : ""
-                }`}
-              >
-                Contact
-              </Nav.Link>
-            </Nav>
-
-            <div
-              ref={searchContainerRef}
-              className="search-container d-none d-lg-block"
-            >
-              {renderSearchForm()}
-              {searchQuery && renderSuggestions()}
-            </div>
-
-            {user ? (
-              <Nav className="user-actions">
-                <NavDropdown
-                  title={
-                    <div className="notification-icon-wrapper">
-                      <BellFill size={20} />
-                      {unreadCount > 0 && (
-                        <Badge pill bg="danger" className="notification-badge">
-                          {unreadCount > 99 ? "99+" : unreadCount}
-                        </Badge>
-                      )}
-                    </div>
-                  }
-                  id="notification-dropdown"
-                  align="end"
-                  className="notification-dropdown"
-                >
-                  <div className="notification-header">
-                    <strong>Notifications</strong>
-                    {unreadCount > 0 && (
-                      <Button
-                        variant="link"
-                        size="sm"
-                        onClick={markAllAsRead}
-                        className="mark-read-btn"
-                      >
-                        Mark all read
-                      </Button>
-                    )}
-                  </div>
-                  <NavDropdown.Divider className="m-0" />
-                  <div className="notification-list">
-                    {notifications.length > 0 ? (
-                      notifications.map((n) => (
-                        <NavDropdown.Item
-                          key={n.id}
-                          className={`notification-item ${
-                            !n.is_read ? "unread" : ""
-                          }`}
-                        >
-                          <div className="notification-message">
-                            {n.message}
-                          </div>
-                          <div className="notification-time">
-                            {new Date(n.created_at).toLocaleString()}
-                          </div>
-                        </NavDropdown.Item>
-                      ))
-                    ) : (
-                      <div className="no-notifications">
-                        No new notifications
-                      </div>
-                    )}
-                  </div>
-                </NavDropdown>
-
-                <NavDropdown
-                  title={
-                    <div className="profile-icon-wrapper">
-                      {user.profile?.profile_picture ? (
-                        <Image
-                          src={user.profile.profile_picture}
-                          rounded
-                          className="profile-image"
-                          alt={user.full_name || "Profile"}
-                        />
-                      ) : (
-                        <PersonCircle
-                          size={24}
-                          className="profile-placeholder"
-                        />
-                      )}
-                    </div>
-                  }
-                  id="profile-dropdown"
-                  align="end"
-                  className="profile-dropdown"
-                >
-                  <div className="profile-header">
-                    <strong>{user.full_name || "User"}</strong>
-                    <small>{user.email}</small>
-                  </div>
-                  <NavDropdown.Divider className="m-0" />
-                  <NavDropdown.Item
-                    as={Link}
-                    to="/profile"
-                    className="dropdown-item-custom"
-                  >
-                    My Profile
-                  </NavDropdown.Item>
-                  <NavDropdown.Item
-                    as={Link}
-                    to="/settings"
-                    className="dropdown-item-custom"
-                  >
-                    Settings
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider className="m-0" />
-                  <NavDropdown.Item
-                    onClick={handleLogout}
-                    className="dropdown-item-custom logout-item"
-                  >
-                    Logout
-                  </NavDropdown.Item>
-                </NavDropdown>
-              </Nav>
-            ) : (
-              <Nav className="auth-actions">
-                <Button
+            {/* --- FIX: Wrapper for flexible desktop layout --- */}
+            <div className="main-nav-content">
+              <Nav className="nav-links">
+                <Nav.Link
                   as={Link}
-                  to="/login"
-                  variant="outline-primary"
-                  className="login-btn"
+                  to="/"
+                  className={`nav-item-custom ${isActive("/") ? "active" : ""}`}
                 >
-                  Login
-                </Button>
-                <Button as={Link} to="/register" className="register-btn">
-                  Register
-                </Button>
+                  Home
+                </Nav.Link>
+                <Nav.Link
+                  as={Link}
+                  to="/internships"
+                  className={`nav-item-custom ${
+                    isActive("/internships") ? "active" : ""
+                  }`}
+                >
+                  Internships
+                </Nav.Link>
+                <Nav.Link
+                  as={Link}
+                  to="/about"
+                  className={`nav-item-custom ${
+                    isActive("/about") ? "active" : ""
+                  }`}
+                >
+                  About
+                </Nav.Link>
+                <Nav.Link
+                  as={Link}
+                  to="/contact"
+                  className={`nav-item-custom ${
+                    isActive("/contact") ? "active" : ""
+                  }`}
+                >
+                  Contact
+                </Nav.Link>
               </Nav>
-            )}
+
+              <div
+                ref={searchContainerRef}
+                className="search-container d-none d-lg-flex"
+              >
+                {renderSearchForm()}
+                {searchQuery && renderSuggestions()}
+              </div>
+
+              {user ? (
+                <Nav className="user-actions">
+                  <NavDropdown
+                    title={
+                      isMobile ? (
+                        <>
+                          <BellFill size={20} className="me-2" />
+                          <span>Notifications</span>
+                          {unreadCount > 0 && (
+                            <Badge pill bg="danger" className="ms-auto">
+                              {unreadCount}
+                            </Badge>
+                          )}
+                        </>
+                      ) : (
+                        <div className="notification-icon-wrapper">
+                          <BellFill size={20} />
+                          {unreadCount > 0 && (
+                            <Badge
+                              pill
+                              bg="danger"
+                              className="notification-badge"
+                            >
+                              {unreadCount > 99 ? "99+" : unreadCount}
+                            </Badge>
+                          )}
+                        </div>
+                      )
+                    }
+                    id="notification-dropdown"
+                    align="end"
+                    className="notification-dropdown"
+                  >
+                    <div className="notification-header">
+                      <strong>Notifications</strong>
+                      {unreadCount > 0 && (
+                        <Button
+                          variant="link"
+                          size="sm"
+                          onClick={markAllAsRead}
+                          className="mark-read-btn"
+                        >
+                          Mark all read
+                        </Button>
+                      )}
+                    </div>
+                    <NavDropdown.Divider className="m-0" />
+                    <div className="notification-list">
+                      {notifications.length > 0 ? (
+                        notifications.map((n) => (
+                          <NavDropdown.Item
+                            key={n.id}
+                            className={`notification-item ${
+                              !n.is_read ? "unread" : ""
+                            }`}
+                          >
+                            <div className="notification-message">
+                              {n.message}
+                            </div>
+                            <div className="notification-time">
+                              {new Date(n.created_at).toLocaleString()}
+                            </div>
+                          </NavDropdown.Item>
+                        ))
+                      ) : (
+                        <div className="no-notifications">
+                          No new notifications
+                        </div>
+                      )}
+                    </div>
+                  </NavDropdown>
+
+                  <NavDropdown
+                    title={
+                      isMobile ? (
+                        <>
+                          {user.profile?.profile_picture ? (
+                            <Image
+                              src={user.profile.profile_picture}
+                              className="mobile-profile-img me-2"
+                            />
+                          ) : (
+                            <PersonCircle size={24} className="me-2" />
+                          )}
+                          <span>{user.full_name || "Profile"}</span>
+                        </>
+                      ) : (
+                        <div className="profile-icon-wrapper">
+                          {user.profile?.profile_picture ? (
+                            <Image
+                              src={user.profile.profile_picture}
+                              className="profile-image"
+                              alt={user.full_name || "Profile"}
+                            />
+                          ) : (
+                            <PersonCircle
+                              size={24}
+                              className="profile-placeholder"
+                            />
+                          )}
+                        </div>
+                      )
+                    }
+                    id="profile-dropdown"
+                    align="end"
+                    className="profile-dropdown"
+                  >
+                    <div className="profile-header">
+                      <strong>{user.full_name || "User"}</strong>
+                      <small>{user.email}</small>
+                    </div>
+                    <NavDropdown.Divider className="m-0" />
+                    <NavDropdown.Item
+                      as={Link}
+                      to="/profile"
+                      className="dropdown-item-custom"
+                    >
+                      My Profile
+                    </NavDropdown.Item>
+                    <NavDropdown.Item
+                      as={Link}
+                      to="/settings"
+                      className="dropdown-item-custom"
+                    >
+                      Settings
+                    </NavDropdown.Item>
+                    <NavDropdown.Divider className="m-0" />
+                    <NavDropdown.Item
+                      onClick={handleLogout}
+                      className="dropdown-item-custom logout-item"
+                    >
+                      Logout
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                </Nav>
+              ) : (
+                <Nav className="auth-actions">
+                  <Button
+                    as={Link}
+                    to="/login"
+                    variant="outline-primary"
+                    className="login-btn"
+                  >
+                    Login
+                  </Button>
+                  <Button as={Link} to="/register" className="register-btn">
+                    Register
+                  </Button>
+                </Nav>
+              )}
+            </div>
           </Navbar.Collapse>
         </Container>
       </Navbar>

@@ -9,7 +9,7 @@ import "./BlazeAI.css";
 const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 
 // --- CRITICAL FIX: Use the correct, current model name ---
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 // --- NEW: Copy Button Component for Code Blocks ---
 const CopyButton = ({ textToCopy }) => {
