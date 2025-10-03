@@ -1,141 +1,207 @@
-/* BlazeAI.css - Completely revamped styles */
+/* BlazeAI.css - Full Screen Design */
 
 :root {
   --brand-gradient: linear-gradient(135deg, #9333ea, #3b82f6);
   --bg-primary: #ffffff;
   --bg-secondary: #f9fafb;
+  --bg-chat: #fafafa;
   --border-color: #e5e7eb;
   --text-primary: #111827;
   --text-secondary: #6b7280;
-  --user-msg-bg: #f3f4f6;
+  --user-msg-bg: #9333ea;
+  --user-msg-text: #ffffff;
   --ai-msg-bg: #ffffff;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .blaze-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-chat);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  overflow: hidden;
 }
 
-/* Header */
+/* Header - Full Width */
 .blaze-header {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2rem;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--bg-primary);
   flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
 }
+
 .blaze-header-logo {
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   background: var(--brand-gradient);
   color: white;
-  border-radius: 0.5rem;
+  border-radius: 0.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 0.75rem;
-}
-.blaze-header-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  margin-right: 0.875rem;
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
 }
 
-/* Messages Area */
+.blaze-header-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
+}
+
+/* Messages Area - Full Width */
 .blaze-messages-area {
   flex: 1;
   overflow-y: auto;
   position: relative;
+  width: 100%;
 }
 
 .blaze-messages-container {
-  max-width: 48rem;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+  width: 100%;
+  padding: 2.5rem 2rem;
+  min-height: 100%;
 }
 
-/* Empty State */
+/* Empty State - Centered */
 .blaze-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  padding: 1rem;
+  min-height: calc(100vh - 200px);
+  padding: 2rem;
 }
+
 .blaze-logo {
-  width: 4rem;
-  height: 4rem;
+  width: 5rem;
+  height: 5rem;
   background: var(--brand-gradient);
-  border-radius: 1rem;
+  border-radius: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 24px rgba(147, 51, 234, 0.3);
+  animation: float 3s ease-in-out infinite;
 }
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 .blaze-logo .w-10 {
-  width: 2.5rem;
+  width: 3rem;
 }
+
 .blaze-logo .h-10 {
-  height: 2.5rem;
+  height: 3rem;
 }
+
 .blaze-title {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
   background: var(--brand-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: -0.025em;
 }
+
 .blaze-subtitle {
   color: var(--text-secondary);
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   font-size: 1.125rem;
+  font-weight: 500;
 }
+
 .blaze-suggestions {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  max-width: 40rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  max-width: 1000px;
   width: 100%;
 }
+
 .blaze-suggestion-card {
-  padding: 1rem;
+  padding: 1.25rem 1.5rem;
   border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   text-align: left;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: var(--bg-primary);
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
 }
+
 .blaze-suggestion-card:hover {
-  background-color: #f3f4f6;
-  border-color: #d1d5db;
+  background: linear-gradient(
+    135deg,
+    rgba(147, 51, 234, 0.05),
+    rgba(59, 130, 246, 0.05)
+  );
+  border-color: #c4b5fd;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
+
 .blaze-suggestion-title {
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.375rem;
+  color: var(--text-primary);
+  font-size: 1rem;
 }
+
 .blaze-suggestion-desc {
   font-size: 0.875rem;
   color: var(--text-secondary);
+  line-height: 1.4;
 }
 
-/* Message Bubbles */
+/* Message Bubbles - Full Width Layout */
 .blaze-message-wrapper {
   display: flex;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   width: 100%;
+  animation: fadeIn 0.3s ease-in;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .blaze-message-wrapper.user {
   justify-content: flex-end;
 }
+
 .blaze-message-wrapper.assistant {
   justify-content: flex-start;
 }
@@ -144,204 +210,260 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  max-width: 90%;
+  max-width: 85%;
 }
+
 .blaze-message-wrapper.user .blaze-message-content {
   flex-direction: row-reverse;
 }
 
 .blaze-avatar {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   color: white;
+  box-shadow: var(--shadow-sm);
 }
+
 .blaze-avatar.user {
-  background-color: #a78bfa;
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
 }
+
 .blaze-avatar.assistant {
   background: var(--brand-gradient);
 }
 
 .blaze-message-body {
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1.125rem;
   color: var(--text-primary);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
+
 .blaze-message-body.user {
-  background-color: var(--user-msg-bg);
+  background: var(--user-msg-bg);
+  color: var(--user-msg-text);
+  border-radius: 1.125rem 1.125rem 0.25rem 1.125rem;
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.2);
 }
+
 .blaze-message-body.assistant {
   background-color: var(--ai-msg-bg);
   border: 1px solid var(--border-color);
+  border-radius: 1.125rem 1.125rem 1.125rem 0.25rem;
   width: 100%;
+  box-shadow: var(--shadow-sm);
 }
 
 .blaze-message-body p {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.875rem;
   white-space: pre-wrap;
 }
+
 .blaze-message-body p:last-child {
   margin-bottom: 0;
 }
+
 .blaze-message-body h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 1.5rem 0 0.75rem;
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.875rem;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
 }
+
 .blaze-message-body h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  margin: 1.25rem 0 0.5rem;
+  margin: 1.25rem 0 0.625rem;
+  color: var(--text-primary);
 }
+
 .blaze-message-body strong {
   font-weight: 600;
+  color: var(--text-primary);
 }
+
 .blaze-message-body code {
-  background-color: #e5e7eb;
-  color: #be123c;
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
+  background-color: #f3e8ff;
+  color: #7c3aed;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.375rem;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
     monospace;
-  font-size: 0.9em;
+  font-size: 0.875em;
+  font-weight: 500;
 }
+
 .blaze-message-body ul,
 .blaze-message-body ol {
-  padding-left: 1.25rem;
-  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  margin-bottom: 0.875rem;
 }
+
 .blaze-message-body li {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.375rem;
 }
 
 /* Code Blocks */
 .blaze-code-block {
-  margin: 1rem 0;
-  border-radius: 0.5rem;
+  margin: 1.25rem 0;
+  border-radius: 0.75rem;
   overflow: hidden;
   border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
+
 .blaze-code-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f3f4f6;
-  padding: 0.5rem 1rem;
+  background: linear-gradient(to right, #f9fafb, #f3f4f6);
+  padding: 0.625rem 1rem;
   font-size: 0.875rem;
   color: var(--text-secondary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color);
 }
+
 .blaze-copy-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: none;
-  border: none;
+  background: white;
+  border: 1px solid var(--border-color);
   cursor: pointer;
   color: var(--text-secondary);
-  font-size: 0.875rem;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  font-weight: 500;
 }
+
 .blaze-copy-button:hover {
-  background-color: #e5e7eb;
+  background-color: #f9fafb;
   color: var(--text-primary);
+  border-color: #9333ea;
 }
+
 .blaze-code-block pre {
-  background-color: #111827;
-  color: #d1d5db;
-  padding: 1rem;
+  background-color: #1e293b;
+  color: #e2e8f0;
+  padding: 1.25rem;
   margin: 0;
   overflow-x: auto;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
     monospace;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
 }
+
 .blaze-code-block pre code {
   background: none;
   color: inherit;
   padding: 0;
 }
 
-/* Input Area */
+/* Input Area - Full Width */
 .blaze-input-area {
-  padding: 1rem 0 0 0;
+  padding: 1.25rem 2rem 1rem 2rem;
   border-top: 1px solid var(--border-color);
   background-color: var(--bg-primary);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
+
 .blaze-input-container {
-  max-width: 48rem;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
 }
+
 .blaze-input-form {
   position: relative;
 }
+
 .blaze-textarea {
   width: 100%;
-  padding: 0.875rem 3.5rem 0.875rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.75rem;
+  padding: 1rem 4rem 1rem 1.25rem;
+  border: 2px solid var(--border-color);
+  border-radius: 1.25rem;
   resize: none;
   max-height: 200px;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
   background-color: #ffffff;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
 }
+
 .blaze-textarea:focus {
   outline: none;
-  border-color: #a78bfa;
-  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+  border-color: #9333ea;
+  box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1), var(--shadow-sm);
 }
+
 .blaze-textarea:disabled {
   background-color: #f9fafb;
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .blaze-send-button {
   position: absolute;
-  right: 0.5rem;
-  bottom: 0.5rem;
-  width: 2.25rem;
-  height: 2.25rem;
-  background-color: #9333ea;
+  right: 0.625rem;
+  bottom: 0.625rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--brand-gradient);
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
 }
+
 .blaze-send-button:hover:not(:disabled) {
-  background-color: #7e22ce;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
 }
+
+.blaze-send-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
 .blaze-send-button:disabled {
-  background-color: #c4b5fd;
+  background: linear-gradient(135deg, #d8b4fe, #c4b5fd);
   cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
 }
 
 .blaze-footer-text {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: #9ca3af;
   text-align: center;
-  margin-top: 0.75rem;
-  padding-bottom: 0.5rem;
+  margin-top: 0.875rem;
+  font-weight: 400;
 }
 
 /* Animations */
 .blaze-spinner {
   animation: spin 1s linear infinite;
 }
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -353,36 +475,105 @@
 
 .blaze-cursor {
   display: inline-block;
-  width: 10px;
+  width: 2px;
   height: 1.2em;
-  background-color: var(--text-primary);
+  background: linear-gradient(to bottom, #9333ea, #3b82f6);
   animation: blink 1s step-end infinite;
   vertical-align: text-bottom;
+  margin-left: 2px;
+  border-radius: 1px;
 }
+
 @keyframes blink {
   50% {
     opacity: 0;
   }
 }
 
+/* Custom Scrollbar */
+.blaze-messages-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.blaze-messages-area::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.blaze-messages-area::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.blaze-messages-area::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .blaze-header {
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
   }
+
+  .blaze-header-logo {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .blaze-header-title {
+    font-size: 1.125rem;
+  }
+
   .blaze-messages-container {
-    padding: 1rem;
+    padding: 1.5rem 1rem;
   }
+
   .blaze-message-content {
-    max-width: 100%;
+    max-width: 95%;
   }
+
+  .blaze-avatar {
+    width: 2rem;
+    height: 2rem;
+  }
+
   .blaze-suggestions {
     grid-template-columns: 1fr;
+    gap: 0.875rem;
   }
+
   .blaze-input-area {
-    padding: 0.5rem 0 0 0;
+    padding: 1rem 1rem 0.75rem 1rem;
   }
-  .blaze-input-container {
-    padding: 0 0.75rem;
+
+  .blaze-textarea {
+    padding: 0.875rem 3.5rem 0.875rem 1rem;
+    font-size: 1rem;
+  }
+
+  .blaze-title {
+    font-size: 2rem;
+  }
+
+  .blaze-subtitle {
+    font-size: 1rem;
+  }
+
+  .blaze-logo {
+    width: 4rem;
+    height: 4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .blaze-header {
+    padding: 0.875rem 1rem;
+  }
+
+  .blaze-messages-container {
+    padding: 1rem 0.75rem;
+  }
+
+  .blaze-input-area {
+    padding: 0.875rem 0.75rem;
   }
 }

@@ -8,17 +8,17 @@ import "./BlazeAI.css";
 // Initialize the Gemini Model with your API key from the .env file
 const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 
-// --- CRITICAL FIX: Use the correct, current model name ---
+// Use the correct, current model name
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
-// --- NEW: Copy Button Component for Code Blocks ---
+// Copy Button Component for Code Blocks
 const CopyButton = ({ textToCopy }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopied(false), 2000);
     });
   };
 
@@ -55,6 +55,13 @@ const BlazeAIPage = () => {
     }
   }, [input]);
 
+  const handleSuggestionClick = (suggestion) => {
+    setInput(suggestion);
+    // Optional: Auto-submit after clicking suggestion
+    // You can uncomment the next line to auto-submit
+    // setTimeout(() => document.querySelector('.blaze-input-form').requestSubmit(), 100);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
@@ -66,7 +73,7 @@ const BlazeAIPage = () => {
     setMessages((prev) => [
       ...prev,
       { role: "user", content: userMessage },
-      { role: "assistant", content: "" }, // Placeholder for streaming
+      { role: "assistant", content: "" },
     ]);
 
     setLoading(true);
@@ -105,7 +112,7 @@ const BlazeAIPage = () => {
         generationConfig: { maxOutputTokens: 2000 },
       });
 
-      // --- NEW: Implement Streaming Response ---
+      // Implement Streaming Response
       const result = await chat.sendMessageStream(userMessage);
 
       for await (const chunk of result.stream) {
@@ -121,7 +128,6 @@ const BlazeAIPage = () => {
       console.error("Error calling Gemini API:", err);
       let errorMessage = "An unknown error occurred.";
       if (err.message) {
-        // Extract user-friendly error from Gemini's response
         const match = err.message.match(/\[\d{3}\s\w+\]\s(.*)/);
         errorMessage = match ? match[1] : err.message;
       }
@@ -141,8 +147,10 @@ const BlazeAIPage = () => {
     const lines = text.split("\n");
     const elements = [];
     let i = 0;
+
     while (i < lines.length) {
       const line = lines[i];
+
       // Code Blocks
       if (line.startsWith("```")) {
         const lang = line.substring(3).trim();
@@ -167,6 +175,7 @@ const BlazeAIPage = () => {
         i++;
         continue;
       }
+
       // Headings
       if (line.startsWith("## ")) {
         elements.push(<h2 key={i}>{line.substring(3)}</h2>);
@@ -191,6 +200,7 @@ const BlazeAIPage = () => {
         elements.push(<ul key={`ul-${i}`}>{listItems}</ul>);
         continue;
       }
+
       // Lists (ordered)
       if (line.match(/^[\d]+\.\s/)) {
         const listItems = [];
@@ -203,6 +213,7 @@ const BlazeAIPage = () => {
         elements.push(<ol key={`ol-${i}`}>{listItems}</ol>);
         continue;
       }
+
       // Paragraphs
       if (line.trim()) {
         elements.push(<p key={i}>{formatInline(line)}</p>);
@@ -233,6 +244,7 @@ const BlazeAIPage = () => {
         </div>
         <h1 className="blaze-header-title">Blaze AI</h1>
       </header>
+
       <div className="blaze-messages-area">
         {messages.length === 0 ? (
           <div className="blaze-empty-state">
@@ -244,40 +256,46 @@ const BlazeAIPage = () => {
             <div className="blaze-suggestions">
               <button
                 onClick={() =>
-                  setInput(
+                  handleSuggestionClick(
                     "Write a cover letter for a software engineer internship"
                   )
                 }
                 className="blaze-suggestion-card"
               >
-                <div className="blaze-suggestion-title">Cover Letter</div>
+                <div className="blaze-suggestion-title">📝 Cover Letter</div>
                 <div className="blaze-suggestion-desc">
                   Write a professional cover letter
                 </div>
               </button>
               <button
-                onClick={() => setInput("What are common interview questions?")}
+                onClick={() =>
+                  handleSuggestionClick("What are common interview questions?")
+                }
                 className="blaze-suggestion-card"
               >
-                <div className="blaze-suggestion-title">Interview Prep</div>
+                <div className="blaze-suggestion-title">💼 Interview Prep</div>
                 <div className="blaze-suggestion-desc">
                   Practice interview questions
                 </div>
               </button>
               <button
-                onClick={() => setInput("Explain REST APIs in simple terms")}
+                onClick={() =>
+                  handleSuggestionClick("Explain REST APIs in simple terms")
+                }
                 className="blaze-suggestion-card"
               >
-                <div className="blaze-suggestion-title">Learn Concepts</div>
+                <div className="blaze-suggestion-title">🎓 Learn Concepts</div>
                 <div className="blaze-suggestion-desc">
                   Understand technical topics
                 </div>
               </button>
               <button
-                onClick={() => setInput("How do I optimize my resume?")}
+                onClick={() =>
+                  handleSuggestionClick("How do I optimize my resume?")
+                }
                 className="blaze-suggestion-card"
               >
-                <div className="blaze-suggestion-title">Resume Tips</div>
+                <div className="blaze-suggestion-title">📄 Resume Tips</div>
                 <div className="blaze-suggestion-desc">
                   Optimize for ATS systems
                 </div>
@@ -312,11 +330,11 @@ const BlazeAIPage = () => {
                 </div>
               </div>
             ))}
-            {/* This div is used to scroll to the bottom */}
             <div ref={messagesEndRef} />
           </div>
         )}
       </div>
+
       <div className="blaze-input-area">
         <div className="blaze-input-container">
           <form onSubmit={handleSubmit} className="blaze-input-form">
