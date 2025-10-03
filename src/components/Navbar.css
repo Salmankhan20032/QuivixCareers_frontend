@@ -20,6 +20,11 @@
   --danger-red: #e53e3e;
   --danger-red-hover: #c53030;
   --danger-red-bg: #fff5f5;
+  --danger-red-border: #e53e3e;
+  --danger-red-bg-light: #fff5f5;
+  --success-green: #38a169;
+  --success-green-border: #38a169;
+  --success-green-bg-light: #f0fff4;
 }
 
 /* Main Navbar Styling */
@@ -36,7 +41,7 @@
   max-width: 1400px;
 }
 
-/* --- FIX: Main content wrapper for flex layout --- */
+/* Main content wrapper for flex layout */
 .main-nav-content {
   display: flex;
   align-items: center;
@@ -95,7 +100,7 @@
   font-weight: 600;
 }
 
-/* --- FIX: Flexible Search Container - Desktop --- */
+/* Flexible Search Container - Desktop */
 .search-container {
   position: relative;
   flex-grow: 1; /* Allow it to take up space */
@@ -236,7 +241,7 @@
   color: var(--text-light);
 }
 
-/* --- NEW: Mobile profile image styling --- */
+/* Mobile profile image styling */
 .mobile-profile-img {
   width: 24px;
   height: 24px;
@@ -299,16 +304,22 @@
 }
 .notification-item.unread {
   background: #f8faff;
-  border-left-color: var(--primary-blue);
 }
 .notification-item:hover {
   background: var(--light-blue-bg);
 }
+
+/* Force notification message to wrap long text */
 .notification-message {
   font-size: 0.92rem;
   margin-bottom: 0.5rem;
   color: var(--text-dark);
+  line-height: 1.5;
+  white-space: normal; /* Explicitly allow wrapping */
+  overflow-wrap: break-word; /* Break long words if they overflow */
+  word-break: break-word; /* Alternative for wider compatibility */
 }
+
 .notification-time {
   font-size: 0.8rem;
   color: var(--text-muted);
@@ -318,6 +329,31 @@
   text-align: center;
   color: var(--text-muted);
 }
+
+/* Styling for Success/Rejected Notifications */
+.notification-item.status-success {
+  border-left-color: var(--success-green-border);
+  background-color: var(--success-green-bg-light);
+}
+.notification-item.status-success .notification-message {
+  color: var(--success-green);
+  font-weight: 500;
+}
+.notification-item.status-success:hover {
+  background-color: #e6fffa; /* A slightly different green for hover */
+}
+.notification-item.status-rejected {
+  border-left-color: var(--danger-red-border);
+  background-color: var(--danger-red-bg-light);
+}
+.notification-item.status-rejected .notification-message {
+  color: var(--danger-red);
+  font-weight: 500;
+}
+.notification-item.status-rejected:hover {
+  background-color: #fed7d7; /* A slightly different red for hover */
+}
+
 .dropdown-item-custom {
   padding: 0.875rem 1.5rem;
   transition: all 0.2s ease;
@@ -424,7 +460,7 @@
     font-size: 1.15rem;
   }
 
-  /* --- FIX: Main content is now just a block element on mobile --- */
+  /* Main content is now just a block element on mobile */
   .main-nav-content {
     flex-direction: column;
   }
@@ -465,7 +501,7 @@
     border-top: 1px solid var(--border-color);
   }
 
-  /* --- FIX: Style dropdown toggles to look like other nav items --- */
+  /* Style dropdown toggles to look like other nav items */
   .notification-dropdown,
   .profile-dropdown {
     width: 100%;

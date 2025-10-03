@@ -1,5 +1,3 @@
-// src/components/Navbar.js
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
@@ -20,7 +18,7 @@ import { PersonCircle, BellFill, Search } from "react-bootstrap-icons";
 import axiosInstance from "../api/axiosInstance";
 import "./Navbar.css";
 
-// --- NEW: Custom hook to detect screen size for responsive rendering ---
+// --- Custom hook to detect screen size for responsive rendering ---
 const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(window.matchMedia(query).matches);
 
@@ -49,7 +47,6 @@ const AppNavbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [navExpanded, setNavExpanded] = useState(false);
 
-  // --- Use the hook to determine layout ---
   const isMobile = useMediaQuery("(max-width: 991px)");
 
   const searchContainerRef = useRef(null);
@@ -143,6 +140,17 @@ const AppNavbar = () => {
     setShowSearch(false);
   }, []);
 
+  const getNotificationStatusClass = (message) => {
+    const lowerCaseMessage = message.toLowerCase();
+    if (lowerCaseMessage.includes("rejected")) {
+      return "status-rejected";
+    }
+    if (lowerCaseMessage.includes("congratulations")) {
+      return "status-success";
+    }
+    return "";
+  };
+
   const isActive = (path) => location.pathname === path;
 
   const renderSearchForm = (isMobile = false) => (
@@ -217,7 +225,6 @@ const AppNavbar = () => {
           </div>
 
           <Navbar.Collapse id="basic-navbar-nav">
-            {/* --- FIX: Wrapper for flexible desktop layout --- */}
             <div className="main-nav-content">
               <Nav className="nav-links">
                 <Nav.Link
@@ -318,7 +325,7 @@ const AppNavbar = () => {
                             key={n.id}
                             className={`notification-item ${
                               !n.is_read ? "unread" : ""
-                            }`}
+                            } ${getNotificationStatusClass(n.message)}`}
                           >
                             <div className="notification-message">
                               {n.message}
