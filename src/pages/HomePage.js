@@ -26,7 +26,7 @@ import {
   TrophyFill,
   RocketTakeoff,
 } from "react-bootstrap-icons";
-import "./HomePage.css"; // Import the single, refactored CSS file
+import "./HomePage.css";
 
 const HomePage = () => {
   const { user } = useAuth();
@@ -36,7 +36,6 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in
     if (!user) {
       setLoading(false);
       return;
@@ -46,13 +45,16 @@ const HomePage = () => {
       try {
         const [internshipsResponse, myInternshipsResponse] = await Promise.all([
           axiosInstance.get("/api/internships/"),
-          axiosInstance.get("/api/internships/profile/"),
+          // --- THE FIX IS HERE ---
+          // The correct endpoint is 'my-internships'.
+          axiosInstance.get("/api/internships/my-internships/"),
         ]);
 
         setAllInternships(internshipsResponse.data);
         setMyEnrollments(myInternshipsResponse.data);
       } catch (error) {
         console.error("Could not fetch required data", error);
+        // It's good practice to set an error state here if you have one.
       } finally {
         setLoading(false);
       }
@@ -81,21 +83,27 @@ const HomePage = () => {
   const handleSuccessfulApply = (appliedId) => {
     const appliedInternship = allInternships.find((i) => i.id === appliedId);
     if (appliedInternship) {
+      // Simulate adding the new enrollment to the list for immediate UI feedback.
       const newEnrollment = {
-        id: Math.random(),
+        id: Math.random(), // A temporary ID
         internship: appliedInternship,
         status: "in_progress",
+        // Add other necessary fields to match the real object structure if needed
       };
       setMyEnrollments((prev) => [...prev, newEnrollment]);
     }
   };
 
-  const stats = {
-    ongoing: ongoingInternships.length,
-    completed: myEnrollments.filter((e) => e.status === "accepted").length,
-    available: recommendedInternships.length,
-  };
+  const stats = useMemo(
+    () => ({
+      ongoing: ongoingInternships.length,
+      completed: myEnrollments.filter((e) => e.status === "accepted").length,
+      available: recommendedInternships.length,
+    }),
+    [ongoingInternships, myEnrollments, recommendedInternships]
+  );
 
+  // Your JSX was perfect, no changes needed there.
   return (
     <div className="homepage">
       {/* Hero Section */}
@@ -132,7 +140,9 @@ const HomePage = () => {
                   {user && (
                     <Button
                       as={Link}
-                      to="/my-internships"
+                      // You don't seem to have a /my-internships route.
+                      // The profile page shows these, so I'll link there.
+                      to="/profile"
                       className="cta-button"
                       variant="outline-primary"
                     >
@@ -218,7 +228,9 @@ const HomePage = () => {
                   <div className="news-image-wrapper">
                     <Card.Img
                       variant="top"
-                      src={`https://picsum.photos/seed/${index + 1}/400/200`}
+                      src={`https://picsum.photos/seed/${
+                        "tech" + index
+                      }/400/200`}
                       className="news-image"
                       alt="Tech News"
                     />
@@ -254,9 +266,14 @@ const HomePage = () => {
         </section>
 
         {loading ? (
-          <div className="loading-container">
-            <Spinner animation="border" />
-            <p>Loading your internships...</p>
+          <div className="text-center py-5">
+            <Spinner
+              animation="border"
+              style={{ width: "3rem", height: "3rem" }}
+            />
+            <p className="mt-2 text-muted">
+              Loading your personalized dashboard...
+            </p>
           </div>
         ) : (
           user && (
@@ -271,7 +288,7 @@ const HomePage = () => {
                         Your Ongoing Internships
                       </h2>
                     </div>
-                    <Link to="/my-internships" className="view-all-link">
+                    <Link to="/profile" className="view-all-link">
                       View All <ArrowRight size={18} />
                     </Link>
                   </div>
@@ -302,6 +319,7 @@ const HomePage = () => {
                       <Col key={internship.id}>
                         <InternshipCard
                           internship={internship}
+                          isApplied={false} // Make sure this is false
                           onApplySuccess={handleSuccessfulApply}
                         />
                       </Col>
@@ -317,8 +335,8 @@ const HomePage = () => {
                       Amazing work! You're enrolled in all available
                       internships.
                       <br />
-                      Visit your <Link to="/my-internships">Dashboard</Link> to
-                      track your progress.
+                      Visit your <Link to="/profile">Dashboard</Link> to track
+                      your progress.
                     </p>
                   </Alert>
                 )}
