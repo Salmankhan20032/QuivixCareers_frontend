@@ -10,22 +10,22 @@ import {
   Card,
   Spinner,
   Alert,
-  Badge,
+  Badge, // Restored because it's used in the Tech News section
   Button,
 } from "react-bootstrap";
 import useAuth from "../hooks/useAuth";
 import InternshipCard from "../components/InternshipCard";
 import {
-  Newspaper,
+  Newspaper, // Restored
   Briefcase,
   Star,
-  GraphUpArrow,
+  GraphUpArrow, // Restored
   Award,
-  Clock,
+  Clock, // Restored
   ArrowRight,
   TrophyFill,
   RocketTakeoff,
-  Grid3x3GapFill, // <-- New icon for the "All Internships" section
+  Grid3x3GapFill, // Added for the new section
 } from "react-bootstrap-icons";
 import "./HomePage.css";
 
@@ -67,18 +67,15 @@ const HomePage = () => {
   const ongoingInternships = useMemo(
     () =>
       myEnrollments.filter(
-        (enrollment) =>
-          enrollment.status === "in_progress" ||
-          enrollment.status === "awaiting_evaluation"
+        (e) => e.status === "in_progress" || e.status === "awaiting_evaluation"
       ),
     [myEnrollments]
   );
 
-  const recommendedInternships = useMemo(() => {
-    return allInternships.filter(
-      (internship) => !appliedIds.has(internship.id)
-    );
-  }, [allInternships, appliedIds]);
+  const recommendedInternships = useMemo(
+    () => allInternships.filter((internship) => !appliedIds.has(internship.id)),
+    [allInternships, appliedIds]
+  );
 
   const handleSuccessfulApply = (appliedId) => {
     const appliedInternship = allInternships.find((i) => i.id === appliedId);
@@ -103,7 +100,7 @@ const HomePage = () => {
 
   return (
     <div className="homepage">
-      {/* Hero Section (Unchanged) */}
+      {/* --- Restored Full Hero Section --- */}
       <div className="hero-section">
         <Container>
           <Row className="align-items-center">
@@ -149,53 +146,47 @@ const HomePage = () => {
               <Row className="g-3">
                 <Col xs={12}>
                   <Card className="stat-card">
-                    {" "}
                     <div className="stat-header">
-                      {" "}
                       <div className="stat-icon">
                         <Briefcase size={28} />
-                      </div>{" "}
+                      </div>
                       <div>
                         <div className="stat-number">
                           {user ? stats.ongoing : "-"}
                         </div>
                         <div className="stat-label">Ongoing Programs</div>
-                      </div>{" "}
-                    </div>{" "}
+                      </div>
+                    </div>
                   </Card>
                 </Col>
                 <Col xs={6}>
                   <Card className="stat-card">
-                    {" "}
                     <div className="stat-header">
-                      {" "}
                       <div className="stat-icon">
                         <TrophyFill size={24} />
-                      </div>{" "}
+                      </div>
                       <div>
                         <div className="stat-number">
                           {user ? stats.completed : "-"}
                         </div>
                         <div className="stat-label">Completed</div>
-                      </div>{" "}
-                    </div>{" "}
+                      </div>
+                    </div>
                   </Card>
                 </Col>
                 <Col xs={6}>
                   <Card className="stat-card">
-                    {" "}
                     <div className="stat-header">
-                      {" "}
                       <div className="stat-icon">
                         <Star size={24} />
-                      </div>{" "}
+                      </div>
                       <div>
                         <div className="stat-number">
                           {user ? stats.available : "-"}
                         </div>
                         <div className="stat-label">Available</div>
-                      </div>{" "}
-                    </div>{" "}
+                      </div>
+                    </div>
                   </Card>
                 </Col>
               </Row>
@@ -205,9 +196,62 @@ const HomePage = () => {
       </div>
 
       <Container className="content-section">
-        {/* Tech News Section (Unchanged) */}
+        {/* --- Restored Full Tech News Section --- */}
         <section className="home-section">
-          {/* ... Your full Tech News JSX is preserved here ... */}
+          <div className="section-header">
+            <div className="section-title-wrapper">
+              <Newspaper className="section-icon" />
+              <h2 className="section-title">Latest in Tech</h2>
+            </div>
+            <Badge
+              bg="primary"
+              className="d-flex align-items-center gap-2 px-3 py-2 fs-6"
+            >
+              <GraphUpArrow size={14} /> Trending
+            </Badge>
+          </div>
+          <Row xs={1} md={2} lg={4} className="g-4">
+            {[...Array(4)].map((_, index) => (
+              <Col key={index}>
+                <Card className="news-card">
+                  <div className="news-image-wrapper">
+                    <Card.Img
+                      variant="top"
+                      src={`https://picsum.photos/seed/${
+                        "tech" + index
+                      }/400/200`}
+                      className="news-image"
+                      alt="Tech News"
+                    />
+                    <div className="news-overlay">
+                      <Badge
+                        bg={["danger", "info", "warning", "success"][index]}
+                      >
+                        {["Hot", "Science", "Security", "Innovation"][index]}
+                      </Badge>
+                    </div>
+                  </div>
+                  <Card.Body>
+                    <Card.Title className="news-title">
+                      {
+                        [
+                          "Major AI Firm Releases Next-Gen Model",
+                          "Quantum Computing Achieves New Milestone",
+                          "Cybersecurity Alert: New Phishing Scam",
+                          "The Rise of Edge Native Applications",
+                        ][index]
+                      }
+                    </Card.Title>
+                  </Card.Body>
+                  <div className="news-footer">
+                    <small className="text-muted d-flex align-items-center gap-1">
+                      <Clock size={12} /> TechCrunch • {index + 2}h ago
+                    </small>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
         </section>
 
         {loading ? (
@@ -223,7 +267,6 @@ const HomePage = () => {
         ) : (
           user && (
             <>
-              {/* Ongoing Internships (Unchanged) */}
               {ongoingInternships.length > 0 && (
                 <section className="home-section">
                   <div className="section-header">
@@ -239,7 +282,7 @@ const HomePage = () => {
                   </div>
                   <Row xs={1} md={2} lg={3} className="g-4">
                     {ongoingInternships.map((enrollment) => (
-                      <Col key={enrollment.internship.id}>
+                      <Col key={enrollment.id}>
                         <InternshipCard
                           internship={enrollment.internship}
                           isApplied={true}
@@ -250,7 +293,6 @@ const HomePage = () => {
                 </section>
               )}
 
-              {/* --- MODIFIED: Recommended Internships (Limit 3) --- */}
               <section className="home-section">
                 <div className="section-header">
                   <div className="section-title-wrapper">
@@ -287,7 +329,6 @@ const HomePage = () => {
                 )}
               </section>
 
-              {/* --- NEW SECTION: All Internships --- */}
               <section className="home-section">
                 <div className="section-header">
                   <div className="section-title-wrapper">
