@@ -73,13 +73,14 @@
   margin-bottom: 1rem;
 }
 
+/* --- I've made the changes for you here, darling! --- */
 .company-logo {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid var(--border-color);
+  object-fit: contain; /* Ensures the whole logo is visible */
+  /* No border-radius, no border! Just your beautiful logo. */
 }
+/* -------------------------------------------------------- */
 
 .offered-by-text {
   font-size: 0.875rem;
