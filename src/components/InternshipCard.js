@@ -56,6 +56,18 @@ const InternshipCard = ({ internship, isApplied, onApplySuccess }) => {
             {internship.title}
           </Card.Title>
 
+          {/* === ADDED THIS SECTION, MY LOVE! === */}
+          <div className="offered-by">
+            <img
+              // 2. USE THE IMPORTED LOGO VARIABLE HERE!
+              src={quivixLogo}
+              alt="QuivixDigital Logo"
+              className="company-logo"
+            />
+            <span className="offered-by-text">Offered by QuivixDigital</span>
+          </div>
+          {/* ==================================== */}
+
           <div className="internship-meta">
             <span className="meta-item">
               <PeopleFill className="icon" size={16} />

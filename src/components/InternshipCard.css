@@ -58,14 +58,36 @@
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-dark);
-  margin-bottom: 1rem;
-  /* Ensure consistent height and prevent layout shift */
+  margin-bottom: 0.75rem; /* Adjusted spacing for the new element */
   min-height: 58px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* === NEW STYLES FOR THE LOGO SECTION ❤️ === */
+.offered-by {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.company-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+
+.offered-by-text {
+  font-size: 0.875rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+/* ========================================= */
 
 .internship-meta {
   margin-top: auto; /* Push meta info to the bottom of the card body */
