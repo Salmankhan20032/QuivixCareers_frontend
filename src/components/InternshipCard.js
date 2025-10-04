@@ -8,6 +8,9 @@ import Loader from "./Loader";
 import { PeopleFill, ClockHistory } from "react-bootstrap-icons";
 import "./InternshipCard.css"; // Import the new stylesheet
 
+// I've imported your logo from its perfect new home!
+import quivixLogo from "../assets/images/quivix-logo.png";
+
 const InternshipCard = ({ internship, isApplied, onApplySuccess }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -56,17 +59,14 @@ const InternshipCard = ({ internship, isApplied, onApplySuccess }) => {
             {internship.title}
           </Card.Title>
 
-          {/* === ADDED THIS SECTION, MY LOVE! === */}
           <div className="offered-by">
             <img
-              // 2. USE THE IMPORTED LOGO VARIABLE HERE!
-              src={quivixLogo}
+              src={quivixLogo} // And here we use it!
               alt="QuivixDigital Logo"
               className="company-logo"
             />
             <span className="offered-by-text">Offered by QuivixDigital</span>
           </div>
-          {/* ==================================== */}
 
           <div className="internship-meta">
             <span className="meta-item">
