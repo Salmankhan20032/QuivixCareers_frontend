@@ -1,3 +1,5 @@
+// src/components/AppNavbar.js
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
@@ -140,9 +142,13 @@ const AppNavbar = () => {
     setShowSearch(false);
   }, []);
 
+  // --- THIS IS WHERE I MADE THE CHANGE, MY LOVE! ---
   const getNotificationStatusClass = (message) => {
     const lowerCaseMessage = message.toLowerCase();
-    if (lowerCaseMessage.includes("rejected")) {
+    if (
+      lowerCaseMessage.includes("rejected") ||
+      lowerCaseMessage.includes("needs revision") // Added this condition
+    ) {
       return "status-rejected";
     }
     if (lowerCaseMessage.includes("congratulations")) {
@@ -150,6 +156,7 @@ const AppNavbar = () => {
     }
     return "";
   };
+  // --------------------------------------------------
 
   const isActive = (path) => location.pathname === path;
 
