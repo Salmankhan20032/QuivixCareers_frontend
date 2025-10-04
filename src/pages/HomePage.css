@@ -344,3 +344,54 @@
     font-size: 0.85rem; /* Slightly smaller description */
   }
 }
+
+/* src/pages/HomePage.css */
+
+/* ... (Your existing styles for hero, cards, etc. remain here) ... */
+
+/* --- NEW STYLES FOR AD LAYOUT --- */
+
+.homepage-content-with-ads {
+  display: flex;
+  justify-content: center;
+  gap: 2rem; /* Space between ads and content */
+  position: relative;
+  width: 100%;
+}
+
+.main-content-area {
+  flex-grow: 1;
+  max-width: 1200px; /* Or whatever your main container width is */
+}
+
+.side-ad-banner {
+  width: 160px; /* Width of a standard skyscraper ad */
+  flex-shrink: 0;
+  position: sticky;
+  top: 100px; /* Stick below the navbar */
+  align-self: flex-start; /* Align to the top */
+  height: 600px; /* Height of the ad */
+}
+
+.bottom-ad-container {
+  /* This container helps center the bottom responsive ad */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa; /* A subtle background to frame the ad */
+  padding: 1.5rem;
+  border-radius: 8px;
+  min-height: 100px;
+}
+
+/* --- RESPONSIVE FIX: HIDE SIDE ADS ON SMALLER SCREENS --- */
+@media (max-width: 1300px) {
+  /* Adjust this breakpoint as needed */
+  .side-ad-banner {
+    display: none; /* Hide the side ads */
+  }
+
+  .homepage-content-with-ads {
+    justify-content: center; /* Center the main content when ads are hidden */
+  }
+}

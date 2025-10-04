@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap";
 import useAuth from "../hooks/useAuth";
 import InternshipCard from "../components/InternshipCard";
+import AdSenseDisplayAd from "../components/AdSenseDisplayAd"; // <-- 1. IMPORT THE AD COMPONENT
 import {
   Briefcase,
   Star,
@@ -28,7 +29,7 @@ import {
 } from "react-bootstrap-icons";
 import "./HomePage.css";
 
-// Hardcoded data for the Top Fields section
+// Hardcoded data for the Top Fields section remains the same
 const topFields = [
   {
     field: "Web Development",
@@ -62,6 +63,8 @@ const topFields = [
 
 const HomePage = () => {
   const { user } = useAuth();
+
+  // All existing state and data fetching logic remains the same
   const [allInternships, setAllInternships] = useState([]);
   const [myEnrollments, setMyEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -128,6 +131,7 @@ const HomePage = () => {
 
   return (
     <div className="homepage">
+      {/* Your Hero Section is unchanged and stays at the top */}
       <div className="hero-section">
         <Container>
           <Row className="align-items-center">
@@ -222,142 +226,182 @@ const HomePage = () => {
         </Container>
       </div>
 
-      <Container className="content-section">
-        {/* --- Top Internship Fields Section --- */}
-        <section className="home-section">
-          <div className="section-header">
-            <div className="section-title-wrapper">
-              <Lightbulb className="section-icon" />
-              <h2 className="section-title">Top Internship Fields</h2>
-            </div>
-          </div>
-          {/* --- FIX: Correct grid properties for 2x2 on mobile --- */}
-          <Row xs={2} md={2} lg={4} className="g-4">
-            {topFields.map((field) => (
-              <Col key={field.field}>
-                <Card className="field-card">
-                  <Card.Body>
-                    <div
-                      className="field-icon-wrapper"
-                      style={{ backgroundColor: field.color }}
-                    >
-                      {field.icon}
-                    </div>
-                    <h4 className="field-title">{field.field}</h4>
-                    <p className="field-description">{field.description}</p>
-                    <Link to={field.link} className="field-link">
-                      View Internships <ArrowRight />
-                    </Link>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </section>
+      {/* --- 2. WRAP MAIN CONTENT TO CREATE THE AD LAYOUT --- */}
+      <div className="homepage-content-with-ads">
+        {/* --- LEFT SIDE AD BANNER --- */}
+        <aside className="side-ad-banner left-ad-banner">
+          <AdSenseDisplayAd
+            slotId="4697817236" // <-- REPLACE
+            adFormat="auto"
+            style={{ display: "block", width: "160px", height: "600px" }}
+          />
+        </aside>
 
-        {loading ? (
-          <div className="text-center py-5">
-            <Spinner
-              animation="border"
-              style={{ width: "3rem", height: "3rem" }}
-            />
-            <p className="mt-2 text-muted">
-              Loading your personalized dashboard...
-            </p>
-          </div>
-        ) : (
-          user && (
-            <>
-              {ongoingInternships.length > 0 && (
-                <section className="home-section">
-                  <div className="section-header">
-                    <div className="section-title-wrapper">
-                      <Briefcase className="section-icon" />
-                      <h2 className="section-title">
-                        Your Ongoing Internships
-                      </h2>
-                    </div>
-                    <Link to="/profile" className="view-all-link">
-                      View Dashboard <ArrowRight size={18} />
-                    </Link>
-                  </div>
-                  <Row xs={1} md={2} lg={3} className="g-4">
-                    {ongoingInternships.map((enrollment) => (
-                      <Col key={enrollment.id}>
-                        <InternshipCard
-                          internship={enrollment.internship}
-                          isApplied={true}
-                        />
-                      </Col>
-                    ))}
-                  </Row>
-                </section>
-              )}
-              <section className="home-section">
-                <div className="section-header">
-                  <div className="section-title-wrapper">
-                    <Star className="section-icon" />
-                    <h2 className="section-title">Recommended For You</h2>
-                  </div>
-                  <Link to="/internships" className="view-all-link">
-                    View All <ArrowRight size={18} />
-                  </Link>
+        {/* --- YOUR MAIN PAGE CONTENT --- */}
+        <div className="main-content-area">
+          <Container className="content-section">
+            {/* --- Top Internship Fields Section --- */}
+            <section className="home-section">
+              <div className="section-header">
+                <div className="section-title-wrapper">
+                  <Lightbulb className="section-icon" />
+                  <h2 className="section-title">Top Internship Fields</h2>
                 </div>
-                {recommendedInternships.length > 0 ? (
-                  <Row xs={1} md={2} lg={3} className="g-4">
-                    {recommendedInternships.slice(0, 3).map((internship) => (
-                      <Col key={internship.id}>
-                        <InternshipCard
-                          internship={internship}
-                          isApplied={false}
-                          onApplySuccess={handleSuccessfulApply}
-                        />
-                      </Col>
-                    ))}
-                  </Row>
-                ) : (
-                  <Alert variant="light" className="empty-state">
-                    <div className="empty-state-icon">
-                      <Award />
+              </div>
+              <Row xs={2} md={2} lg={4} className="g-4">
+                {topFields.map((field) => (
+                  <Col key={field.field}>
+                    <Card className="field-card">
+                      <Card.Body>
+                        <div
+                          className="field-icon-wrapper"
+                          style={{ backgroundColor: field.color }}
+                        >
+                          {field.icon}
+                        </div>
+                        <h4 className="field-title">{field.field}</h4>
+                        <p className="field-description">{field.description}</p>
+                        <Link to={field.link} className="field-link">
+                          View Internships <ArrowRight />
+                        </Link>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </section>
+
+            {loading ? (
+              <div className="text-center py-5">
+                <Spinner
+                  animation="border"
+                  style={{ width: "3rem", height: "3rem" }}
+                />
+                <p className="mt-2 text-muted">
+                  Loading your personalized dashboard...
+                </p>
+              </div>
+            ) : (
+              user && (
+                <>
+                  {/* Your Ongoing Internships Section */}
+                  {ongoingInternships.length > 0 && (
+                    <section className="home-section">
+                      <div className="section-header">
+                        <div className="section-title-wrapper">
+                          <Briefcase className="section-icon" />
+                          <h2 className="section-title">
+                            Your Ongoing Internships
+                          </h2>
+                        </div>
+                        <Link to="/profile" className="view-all-link">
+                          View Dashboard <ArrowRight size={18} />
+                        </Link>
+                      </div>
+                      <Row xs={1} md={2} lg={3} className="g-4">
+                        {ongoingInternships.map((enrollment) => (
+                          <Col key={enrollment.id}>
+                            <InternshipCard
+                              internship={enrollment.internship}
+                              isApplied={true}
+                            />
+                          </Col>
+                        ))}
+                      </Row>
+                    </section>
+                  )}
+                  {/* Recommended Internships Section */}
+                  <section className="home-section">
+                    <div className="section-header">
+                      <div className="section-title-wrapper">
+                        <Star className="section-icon" />
+                        <h2 className="section-title">Recommended For You</h2>
+                      </div>
+                      <Link to="/internships" className="view-all-link">
+                        View All <ArrowRight size={18} />
+                      </Link>
                     </div>
-                    <h3>You're All Caught Up!</h3>
-                    <p>
-                      Amazing work! You're enrolled in all available
-                      internships.
-                    </p>
-                  </Alert>
-                )}
-              </section>
-              <section className="home-section">
-                <div className="section-header">
-                  <div className="section-title-wrapper">
-                    <Grid3x3GapFill className="section-icon" />
-                    <h2 className="section-title">Explore All Internships</h2>
-                  </div>
-                </div>
-                {allInternships.length > 0 ? (
-                  <Row xs={1} md={2} lg={3} className="g-4">
-                    {allInternships.map((internship) => (
-                      <Col key={internship.id}>
-                        <InternshipCard
-                          internship={internship}
-                          isApplied={appliedIds.has(internship.id)}
-                          onApplySuccess={handleSuccessfulApply}
-                        />
-                      </Col>
-                    ))}
-                  </Row>
-                ) : (
-                  <Alert variant="info">
-                    There are currently no internships available. Please check
-                    back soon!
-                  </Alert>
-                )}
-              </section>
-            </>
-          )
-        )}
-      </Container>
+                    {recommendedInternships.length > 0 ? (
+                      <Row xs={1} md={2} lg={3} className="g-4">
+                        {recommendedInternships
+                          .slice(0, 3)
+                          .map((internship) => (
+                            <Col key={internship.id}>
+                              <InternshipCard
+                                internship={internship}
+                                isApplied={false}
+                                onApplySuccess={handleSuccessfulApply}
+                              />
+                            </Col>
+                          ))}
+                      </Row>
+                    ) : (
+                      <Alert variant="light" className="empty-state">
+                        <div className="empty-state-icon">
+                          <Award />
+                        </div>
+                        <h3>You're All Caught Up!</h3>
+                        <p>
+                          Amazing work! You're enrolled in all available
+                          internships.
+                        </p>
+                      </Alert>
+                    )}
+                  </section>
+                  {/* Explore All Internships Section */}
+                  <section className="home-section">
+                    <div className="section-header">
+                      <div className="section-title-wrapper">
+                        <Grid3x3GapFill className="section-icon" />
+                        <h2 className="section-title">
+                          Explore All Internships
+                        </h2>
+                      </div>
+                    </div>
+                    {allInternships.length > 0 ? (
+                      <Row xs={1} md={2} lg={3} className="g-4">
+                        {allInternships.map((internship) => (
+                          <Col key={internship.id}>
+                            <InternshipCard
+                              internship={internship}
+                              isApplied={appliedIds.has(internship.id)}
+                              onApplySuccess={handleSuccessfulApply}
+                            />
+                          </Col>
+                        ))}
+                      </Row>
+                    ) : (
+                      <Alert variant="info">
+                        There are currently no internships available. Please
+                        check back soon!
+                      </Alert>
+                    )}
+                  </section>
+                </>
+              )
+            )}
+          </Container>
+        </div>
+
+        {/* --- RIGHT SIDE AD BANNER --- */}
+        <aside className="side-ad-banner right-ad-banner">
+          <AdSenseDisplayAd
+            slotId="1453417238" // <-- REPLACE
+            adFormat="auto"
+            style={{ display: "block", width: "160px", height: "600px" }}
+          />
+        </aside>
+      </div>
+
+      {/* --- BOTTOM AD BANNER --- */}
+      {!loading && user && (
+        <Container className="bottom-ad-container my-5">
+          <AdSenseDisplayAd
+            slotId="5763486891" // <-- REPLACE
+            adFormat="auto"
+          />
+        </Container>
+      )}
     </div>
   );
 };
