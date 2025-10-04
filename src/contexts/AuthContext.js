@@ -1,5 +1,6 @@
 // src/contexts/AuthContext.js
-import React, { createContext, useState, useEffect } from "react";
+
+import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import axiosInstance from "../api/axiosInstance";
@@ -14,12 +15,17 @@ export const AuthProvider = ({ children }) => {
       ? JSON.parse(localStorage.getItem("authTokens"))
       : null
   );
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Initialize user from localStorage directly to avoid flicker
+  const [user, setUser] = useState(() =>
+    localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user"))
+      : null
+  );
+  const [loading, setLoading] = useState(true); // Manages initial app load screen
 
   const navigate = useNavigate();
 
-  // This function is for standard login for already verified users
+  // Your existing login function is correct
   const loginUser = async (email, password) => {
     try {
       const response = await axios.post(`${baseURL}/api/auth/login/`, {
@@ -29,14 +35,13 @@ export const AuthProvider = ({ children }) => {
       if (response.status === 200) {
         setAuthTokens(response.data);
         localStorage.setItem("authTokens", JSON.stringify(response.data));
-
+        // Fetch fresh user profile right after login
         const userProfileResponse = await axiosInstance.get(
           "/api/auth/profile/"
         );
         const userData = userProfileResponse.data;
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
-
         if (!userData.profile.university || !userData.profile.interest) {
           navigate("/onboarding");
         } else {
@@ -53,6 +58,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Your existing register function is correct
   const registerUser = async (
     email,
     fullName,
@@ -74,21 +80,14 @@ export const AuthProvider = ({ children }) => {
         "Registration failed:",
         error.response?.data || error.message
       );
-
-      // --- THE FIX IS HERE ---
-      // This logic provides a much cleaner error message to the user.
       let errorMessage = "Registration failed! An unexpected error occurred.";
       if (error.response) {
-        // If the backend sent a structured JSON error
         if (
           typeof error.response.data === "object" &&
           error.response.data !== null
         ) {
-          // Join validation errors into a single string
           errorMessage = Object.values(error.response.data).flat().join(" ");
-        }
-        // If the backend sent an HTML error page (like a 500 error)
-        else if (
+        } else if (
           typeof error.response.data === "string" &&
           error.response.data.includes("</html>")
         ) {
@@ -100,6 +99,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Your existing post-verification login function is correct
   const loginAfterVerification = (data) => {
     setAuthTokens(data);
     setUser(data.user);
@@ -113,31 +113,54 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logoutUser = () => {
+  // --- STEP 1: STABILIZE THE LOGOUT FUNCTION ---
+  // We wrap logoutUser in useCallback so its reference doesn't change on every render.
+  const logoutUser = useCallback(() => {
     setAuthTokens(null);
     setUser(null);
     localStorage.removeItem("authTokens");
     localStorage.removeItem("user");
     navigate("/login");
-  };
+  }, [navigate]);
+
+  // --- STEP 2: THE FIX - A GLOBAL INTERCEPTOR ---
+  // This useEffect sets up a "bodyguard" for all API calls made with axiosInstance.
+  useEffect(() => {
+    const responseInterceptor = axiosInstance.interceptors.response.use(
+      (response) => response, // Pass through successful responses
+      (error) => {
+        // Check for the specific 401 Unauthorized error
+        if (error.response && error.response.status === 401) {
+          console.log("Token expired or invalid. Logging out...");
+          logoutUser(); // This triggers our global logout and redirects to login
+        }
+        // For all other errors, just let them be handled by the component that made the call
+        return Promise.reject(error);
+      }
+    );
+
+    // This is a "cleanup" function that runs when the AuthProvider unmounts.
+    // It removes the interceptor to prevent memory leaks.
+    return () => {
+      axiosInstance.interceptors.response.eject(responseInterceptor);
+    };
+  }, [logoutUser]); // This effect correctly depends on our stable logoutUser function.
+
+  // This useEffect simply manages the initial loading screen of the app.
+  useEffect(() => {
+    setLoading(false);
+  }, []);
 
   const contextData = {
     user,
     setUser,
     authTokens,
+    setAuthTokens,
     loginUser,
     logoutUser,
     registerUser,
     loginAfterVerification,
   };
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (authTokens && storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
-  }, [authTokens]);
 
   return (
     <AuthContext.Provider value={contextData}>
