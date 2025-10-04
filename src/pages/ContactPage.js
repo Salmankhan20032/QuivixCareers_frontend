@@ -33,15 +33,15 @@ const ContactPage = () => {
               <ul className="list-unstyled">
                 <li className="mb-3 d-flex align-items-center">
                   <EnvelopeFill size={20} className="me-3" color="#6e8efb" />
-                  <span>support@quivixinternships.com</span>
+                  <span>support@quivixcareers.com</span>
                 </li>
                 <li className="mb-3 d-flex align-items-center">
                   <TelephoneFill size={20} className="me-3" color="#6e8efb" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>+966 12 345 6789</span>
                 </li>
                 <li className="d-flex align-items-center">
                   <GeoAltFill size={20} className="me-3" color="#6e8efb" />
-                  <span>123 Tech Avenue, Silicon Valley, CA</span>
+                  <span>Jeddah, Saudi Arabia</span>
                 </li>
               </ul>
             </Col>
