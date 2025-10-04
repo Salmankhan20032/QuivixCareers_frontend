@@ -32,7 +32,7 @@ import "./HomePage.css";
 // Hardcoded data for the Top Fields section remains the same
 const topFields = [
   {
-    field: "Web Development",
+    field: "Web Dev",
     icon: <CodeSlash size={24} />,
     description: "Build modern, responsive websites and web applications.",
     color: "#007bff",
@@ -53,7 +53,7 @@ const topFields = [
     link: "/internships?field=Cyber%20Security",
   },
   {
-    field: "Cloud Computing",
+    field: "Cloud Comp",
     icon: <CloudFill size={24} />,
     description: "Master scalable infrastructure with AWS, Azure, and GCP.",
     color: "#fd7e14",
